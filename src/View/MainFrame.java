@@ -3,13 +3,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package View;
-import Model.InventoryModel;
+import Model.*;
 import Controller.*;
 
 import java.awt.*;
 import java.util.LinkedList;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
@@ -18,6 +18,10 @@ import javax.swing.table.DefaultTableModel;
 public class MainFrame extends javax.swing.JFrame {
 
     LinkedList<InventoryModel> list = new LinkedList<>();
+    static int size =10;
+    static String [][] addNewStack = new String [size][6];
+       
+
     Operations operations = new Operations();
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
@@ -31,39 +35,9 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         
         
-        operations.setList(list);
-        
-        initialData(operations);
+        Operations.initialData(operations);
         this.list=operations.getList();
-        loadInventoryListToTable(jTable1, list);
-
-    }
-
-    //Setting up the initial components
-     public static void initialData(Operations operations) {
-        operations.addProduct(new InventoryModel("001", "X-Ray Machine", "Xpedent", 85000.00, 5, "2025-01-15"));
-        operations.addProduct(new InventoryModel("002", "Dental Chair", "Gladent", 450000.00, 10, "2025-02-20"));
-        operations.addProduct(new InventoryModel("003", "Sterilizer", "Wintech", 3000.00, 7, "2025-03-10"));
-        operations.addProduct(new InventoryModel("004", "Scaler", "Woodpecker", 5000.00, 15, "2025-04-05"));
-        operations.addProduct(new InventoryModel("005", "Curing Light", "BrightSmile", 5000.00, 20, "2025-05-12"));
-    }
-
-    public static void loadInventoryListToTable(javax.swing.JTable table, java.util.Collection<InventoryModel> list){
-        DefaultTableModel model = (DefaultTableModel) table.getModel();
-        model.setRowCount(0);
-
-        for (InventoryModel l : list)
-        {
-            Object[] row ={
-                    l.getProductID(),
-                    l.getProductName(),
-                    l.getProductCompany(),
-                    l.getProductPrice(),
-                    l.getProductQuantity(),
-                    l.getAddedDate()
-            };
-            model.addRow(row);
-        }
+        Structures.loadInventoryListToTable(jTable1, list);
 
     }
 
@@ -80,6 +54,7 @@ public class MainFrame extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         addNewPanelBtn = new javax.swing.JButton();
         updatePanelBtn = new javax.swing.JButton();
+        viewAllBtn = new javax.swing.JButton();
         adminActionsPanel = new javax.swing.JPanel();
         View = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -153,16 +128,24 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        viewAllBtn.setText("View All Products");
+        viewAllBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewAllBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout adminPanelLayout = new javax.swing.GroupLayout(adminPanel);
         adminPanel.setLayout(adminPanelLayout);
         adminPanelLayout.setHorizontalGroup(
             adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(adminPanelLayout.createSequentialGroup()
                 .addGap(44, 44, 44)
-                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(updatePanelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addNewPanelBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                .addGroup(adminPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(updatePanelBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                    .addComponent(addNewPanelBtn, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                    .addComponent(jButton1)
+                    .addComponent(viewAllBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(131, Short.MAX_VALUE))
         );
         adminPanelLayout.setVerticalGroup(
@@ -170,7 +153,9 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(adminPanelLayout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addComponent(jButton1)
-                .addGap(63, 63, 63)
+                .addGap(22, 22, 22)
+                .addComponent(viewAllBtn)
+                .addGap(18, 18, 18)
                 .addComponent(addNewPanelBtn)
                 .addGap(18, 18, 18)
                 .addComponent(updatePanelBtn)
@@ -481,7 +466,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(adminPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(adminActionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 739, Short.MAX_VALUE))
+                .addComponent(adminActionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -511,41 +496,84 @@ public class MainFrame extends javax.swing.JFrame {
     private void addNewBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewBtnActionPerformed
         // TODO add your handling code here:
         //Btn to add new product to list
-        if(addIDText.getText().isEmpty()|| addNameText.getText().isEmpty()||
-           addCpNameText.getText().isEmpty()|| addPriceText.getText().isEmpty()||
-           addQntText.getText().isEmpty()|| addDateText.getText().isEmpty()){
-            JOptionPane.showMessageDialog(this, "Please fill all the fields", "Error", JOptionPane.ERROR_MESSAGE);
-        }else{
-            String id = addIDText.getText();
-            String name = addNameText.getText();
-            String company = addCpNameText.getText();
-            double price = Double.parseDouble(addPriceText.getText());
-            int quantity = Integer.parseInt(addQntText.getText());
-            String date = addDateText.getText();
+        LinkedList <InventoryModel> checkList = operations.getList();
+        try{
+            if(addIDText.getText().isEmpty()|| addNameText.getText().isEmpty()||
+                    addCpNameText.getText().isEmpty()|| addPriceText.getText().isEmpty()||
+                    addQntText.getText().isEmpty()|| addDateText.getText().isEmpty()){
+                JOptionPane.showMessageDialog(this, "Please fill all the fields", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            for (InventoryModel l : checkList) {
+                if (l.getProductID().equals(addIDText.getText())) {
+                    JOptionPane.showMessageDialog(this, "Product ID already exists", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            if (Double.parseDouble(addPriceText.getText()) < 0) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid price", "Error", JOptionPane.ERROR_MESSAGE);
 
-            InventoryModel newProduct = new InventoryModel(id, name, company, price, quantity, date);
-            operations.addProduct(newProduct);
-            this.list=operations.getList();
-            loadInventoryListToTable(jTable2, list);
+            } else if (Integer.parseInt(addQntText.getText()) < 0) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid quantity", "Error", JOptionPane.ERROR_MESSAGE);
 
-            //Clear the text fields after adding
-            addIDText.setText("");
-            addNameText.setText("");
-            addCpNameText.setText("");
-            addPriceText.setText("");
-            addQntText.setText("");
-            addDateText.setText("");
+            } else if (!addDateText.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
+                JOptionPane.showMessageDialog(this, "Please enter date in YYYY-MM-DD format", "Error", JOptionPane.ERROR_MESSAGE);
 
-            JOptionPane.showMessageDialog(this, "Product added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else{
+                String id = addIDText.getText();
+                String name = addNameText.getText();
+                String company = addCpNameText.getText();
+                double price = Double.parseDouble(addPriceText.getText());
+                int quantity = Integer.parseInt(addQntText.getText());
+                String date = addDateText.getText();
+
+
+                InventoryModel newProduct = new InventoryModel(id, name, company, price, quantity, date);
+                operations.addProduct(newProduct);
+                this.list=operations.getList();
+                Structures.loadInventoryListToTable(jTable1, this.list);
+
+
+                //Clear the text fields after adding
+                addIDText.setText("");
+                addNameText.setText("");
+                addCpNameText.setText("");
+                addPriceText.setText("");
+                addQntText.setText("");
+                addDateText.setText("");
+
+                JOptionPane.showMessageDialog(this, "Product added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                //push to add history stack
+                String [][] value = new String[10][6];
+                value=Structures.pushToStack(addNewStack,id, name, company, price, quantity, date);
+                int rowCount = jTable2.getRowCount();
+                if(rowCount==size-1)
+                    JOptionPane.showMessageDialog(this, "Add new product history is full", "Error", JOptionPane.ERROR_MESSAGE);
+                else
+                    addNewStack= value;
+                Structures.loadFromStack(jTable2,addNewStack);
+
+
+            }
         }
+        catch (NumberFormatException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "Please enter valid numeric values for Price and Quantity", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
         
     }//GEN-LAST:event_addNewBtnActionPerformed
 
     private void updatePanelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatePanelBtnActionPerformed
         // TODO add your handling code here:
-         CardLayout card = (CardLayout)adminActionsPanel.getLayout();
+        CardLayout card = (CardLayout)adminActionsPanel.getLayout();
         card.show(adminActionsPanel, "card4");
     }//GEN-LAST:event_updatePanelBtnActionPerformed
+
+    private void viewAllBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewAllBtnActionPerformed
+        // TODO add your handling code here:
+        CardLayout card = (CardLayout)adminActionsPanel.getLayout();
+        card.show(adminActionsPanel, "card2");
+    }//GEN-LAST:event_viewAllBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -618,5 +646,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField upQntText;
     private javax.swing.JPanel updatePanel;
     private javax.swing.JButton updatePanelBtn;
+    private javax.swing.JButton viewAllBtn;
     // End of variables declaration//GEN-END:variables
 }

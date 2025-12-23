@@ -33,7 +33,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="adminPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="adminActionsPanel" pref="739" max="32767" attributes="0"/>
+              <Component id="adminActionsPanel" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -62,10 +62,11 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="updatePanelBtn" min="-2" pref="125" max="-2" attributes="0"/>
-                      <Component id="addNewPanelBtn" min="-2" pref="125" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="updatePanelBtn" pref="125" max="32767" attributes="0"/>
+                      <Component id="addNewPanelBtn" pref="125" max="32767" attributes="0"/>
                       <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <Component id="viewAllBtn" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="131" max="32767" attributes="0"/>
               </Group>
@@ -76,7 +77,9 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
                   <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                  <Component id="viewAllBtn" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="addNewPanelBtn" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="updatePanelBtn" min="-2" max="-2" attributes="0"/>
@@ -108,6 +111,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updatePanelBtnActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="viewAllBtn">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="View All Products"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewAllBtnActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
