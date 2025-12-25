@@ -20,8 +20,9 @@ public class Structures {
     static String [][] stack = new String [size][6];
     
     
-    public static String[][] pushToStack(String stack[][],String id, String name, String company, double price, int quantity, String date){
-        
+    public static String[][] pushToStack(String  [][] stack,String id, String name, String company, double price, int quantity, String date){
+        if (top==size-1)
+            return stack;
         top++;
         stack[top][0]=id;
         stack[top][1]=name;
@@ -33,14 +34,24 @@ public class Structures {
 
     }
     
-    public static void loadFromStack(JTable table, String stack[][]){
+    public static void loadFromStack(JTable table, String [][] stack){
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
-        for(int i =top ; i>=0; i--){
-            if (stack [i][0]!=null){
-                model.addRow(new Object []{stack[i][0],stack[i][1],stack[i][2],stack[i][3],stack[i][4],stack[i][5]});
+        if (model.getColumnCount()==3){
+            for(int i =top ; i>=0; i--){
+                if (stack [i][0]!=null){
+                    model.addRow(new Object []{stack[i][0],stack[i][1],stack[i][2]});
+                }
             }
         }
+        else{
+            for(int i =top ; i>=0; i--){
+                if (stack [i][0]!=null){
+                    model.addRow(new Object []{stack[i][0],stack[i][1],stack[i][2],stack[i][3],stack[i][4],stack[i][5]});
+                }
+            }
+        }
+
         
     }
     
