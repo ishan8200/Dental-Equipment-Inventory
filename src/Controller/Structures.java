@@ -112,4 +112,23 @@ public class Structures {
 
     }
 
+    public static void loadCartToTable(JTable table, LinkedList<InventoryModel> cartList){
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        for (InventoryModel l : cartList)
+        {
+            Object[] row ={
+                    l.getProductID(),
+                    l.getProductName(),
+                    l.getProductCompany(),
+                    l.getProductPrice(),
+                    l.getProductQuantity(),
+                    l.getAddedDate()
+            };
+            model.addRow(row);
+        }
+
+    }
+
 }

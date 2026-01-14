@@ -9,7 +9,7 @@ package Model;
  * @author Ishan Maharjan
  */
 public class InventoryModel {
-    String productID, productName, productCompany, addedDate;
+    String productID, productName, productCompany, addedDate,status;
     int productQuantity;
     double productPrice;
 
@@ -22,11 +22,12 @@ public class InventoryModel {
         this.addedDate = addedDate;
     }
 
-    public InventoryModel(String productID, double productPrice, int productQuantity) {
+    public InventoryModel(String productID, String productName, double productPrice, int productQuantity, String status) {
         this.productID = productID;
-        this.productQuantity = productQuantity;
+        this.productName = productName;
         this.productPrice = productPrice;
-
+        this.productQuantity = productQuantity;
+        this.status = "Pending";
     }
 
     public String getProductID() {
@@ -75,5 +76,12 @@ public class InventoryModel {
 
     public void setAddedDate(String addedDate) {
         this.addedDate = addedDate;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    public String getStatus() {
+        return status;
     }
 }

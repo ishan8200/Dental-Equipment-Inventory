@@ -4,6 +4,8 @@
  */
 package Model;
 
+import java.util.LinkedList;
+
 /**
  *
  * @author Ripple Device
@@ -13,6 +15,8 @@ public class User {
     String password;
 
     String Name;
+
+    LinkedList <InventoryModel> userCart = new LinkedList<>();
     public User(String username, String password, String Name) {
         this.username = username;
         this.password = password;
@@ -41,5 +45,13 @@ public class User {
 
     public void setName(String name) {
         Name = name;
+    }
+
+    public LinkedList<InventoryModel> getUserCart() {
+        return userCart;
+    }
+
+    public void setUserCart(LinkedList<InventoryModel> userCart) {
+        this.userCart = userCart;
     }
 }
