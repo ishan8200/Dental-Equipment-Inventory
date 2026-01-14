@@ -22,6 +22,13 @@ public class InventoryModel {
         this.addedDate = addedDate;
     }
 
+    public InventoryModel(String productID, double productPrice, int productQuantity) {
+        this.productID = productID;
+        this.productQuantity = productQuantity;
+        this.productPrice = productPrice;
+
+    }
+
     public String getProductID() {
         return productID;
     }

@@ -8,6 +8,8 @@ import Model.InventoryModel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -18,6 +20,9 @@ public class Structures {
     static int size=10;
     static int front=-1, rear=-1, top=-1;
     static String [][] stack = new String [size][6];
+
+    Operations op = new Operations();
+    LinkedList <InventoryModel> list = op.getList();
     
     
     public static String[][] pushToStack(String  [][] stack,String id, String name, String company, double price, int quantity, String date){
@@ -73,5 +78,38 @@ public class Structures {
         }
 
     }
-    
+
+    public static void loadValuetoTable(JTable table, LinkedList<InventoryModel> list, int value){
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        Object[] row ={
+                list.get(value).getProductID(),
+                list.get(value).getProductName(),
+                list.get(value).getProductCompany(),
+                list.get(value).getProductPrice(),
+                list.get(value).getProductQuantity(),
+                list.get(value).getAddedDate()
+        };
+        model.addRow(row);
+    }
+
+    public void loadlistToTable(JTable table, LinkedList<InventoryModel> list, List<Integer> value){
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        for (Integer integer : value) {
+            Object[] row = {
+                    list.get(integer).getProductID(),
+                    list.get(integer).getProductName(),
+                    list.get(integer).getProductCompany(),
+                    list.get(integer).getProductPrice(),
+                    list.get(integer).getProductQuantity(),
+                    list.get(integer).getAddedDate()
+            };
+            model.addRow(row);
+        }
+
+    }
+
 }

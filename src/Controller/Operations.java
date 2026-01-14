@@ -3,9 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Controller;
+import Model.Admin;
+import Model.User;
 import Model.InventoryModel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.util.LinkedList;
 
 
@@ -18,6 +21,7 @@ import java.util.LinkedList;
 public class Operations {
     
     LinkedList<InventoryModel> list = new LinkedList<>();
+    double totalValue=0.0;
 
     public void setList(LinkedList<InventoryModel> listSend){
         this.list=listSend;
@@ -32,6 +36,13 @@ public class Operations {
         list.add(new InventoryModel("003", "Sterilizer", "Wintech", 3000.00, 7, "2025-03-10"));
         list.add(new InventoryModel("004", "Scaler", "Woodpecker", 5000.00, 15, "2025-04-05"));
         list.add(new InventoryModel("005", "Curing Light", "BrightSmile", 5000.00, 20, "2025-05-12"));
+        list.add(new InventoryModel("006", "Autoclave", "SciCan", 7000.00, 8, "2025-06-18"));
+        list.add(new InventoryModel("007", "Dental Handpiece", "Jinme", 1500.00, 25, "2025-07-22"));
+        list.add(new InventoryModel("008", "Intraoral Camera", "Sopro", 12000.00, 4, "2025-08-30"));
+        list.add(new InventoryModel("009", "Dental Laser", "Wintech", 25000.00, 6, "2025-09-14"));
+        list.add(new InventoryModel("010", "Patient Monitor", "Gladent", 8000.00, 9, "2025-10-08"));
+        Admin admin = new Admin("admin", "Ishan Maharjan", "ishan@gmail.com","admin123");
+        User user = new User("user", "user123", "Javier Don");
     }
     public boolean addProduct(JPanel panel, String id, String name, String company, String price, String quantity, String date)
     throws IllegalArgumentException, NumberFormatException{
@@ -159,4 +170,25 @@ public class Operations {
         }
         throw new NullPointerException("Product ID not found");
     }
+
+    public boolean authenticateAdmin(String username, String password) {
+        // Logic to authenticate admin
+        return username.equals("admin") && password.equals("admin123");
+    }
+    public boolean authenticateUser(String username, String password) {
+        // Logic to authenticate user
+        return username.equals("user") && password.equals("user123");
+    }
+
+    public double calculateTotalInventoryValue(LinkedList<InventoryModel> list) {
+        // Logic to calculate total inventory value
+        totalValue=0.0;
+        for (InventoryModel l : list) {
+            totalValue += l.getProductPrice() * l.getProductQuantity();
+        }
+        return totalValue;
+    }
+
+
 }
+

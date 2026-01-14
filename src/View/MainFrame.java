@@ -9,7 +9,9 @@ import Controller.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.LinkedList;
+import java.util.List;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 
 /**
@@ -29,6 +31,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     Operations operations = new Operations();
 
+    Structures structures = new Structures();
+    Sorting sorting = new Sorting();
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
 
     /**
@@ -43,7 +48,36 @@ public class MainFrame extends javax.swing.JFrame {
         operations.initialData();
         this.list=operations.getList();
         Structures.loadInventoryListToTable(viewTableAdmin, list);
+        Structures.loadInventoryListToTable(userViewTbl, list);
 
+    }
+    private void adminLogin(){
+        try {
+            String username = adminUsernameTxt.getText().trim();
+            String password = adminPasswordTxt.getText().trim();
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both username and password", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            boolean isAuthenticated = operations.authenticateAdmin(username, password);
+            if (isAuthenticated) {
+                CardLayout card = (CardLayout) mainPanel.getLayout();
+                card.show(mainPanel, "card5");
+                CardLayout card2 = (CardLayout) navPanel.getLayout();
+                card2.show(navPanel, "card2");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+                // Clear login fields
+                adminUsernameTxt.setText("");
+                adminPasswordTxt.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during login", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
     }
 
     /**
@@ -69,24 +103,30 @@ public class MainFrame extends javax.swing.JFrame {
         logo = new javax.swing.JLabel();
         userPanel = new javax.swing.JPanel();
         userNavPanel = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        userViewBtn = new javax.swing.JButton();
+        useCartBtn = new javax.swing.JButton();
         mainPanel = new javax.swing.JPanel();
         adminLoginPanel = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
-        adminPasswordTxt = new javax.swing.JTextField();
         adminLoginBtn = new javax.swing.JButton();
         adminUsernameTxt = new javax.swing.JTextField();
+        adminPasswordTxt = new javax.swing.JPasswordField();
         userLoginPanel = new javax.swing.JPanel();
         jLabel13 = new javax.swing.JLabel();
         userUsernameTxt = new javax.swing.JTextField();
-        userPasswordTxt = new javax.swing.JTextField();
         userLoginBtn = new javax.swing.JButton();
+        userPasswordTxt = new javax.swing.JPasswordField();
         adminActionsPanel = new javax.swing.JPanel();
         View = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         viewTableAdmin = new javax.swing.JTable();
         jLabel11 = new javax.swing.JLabel();
+        adminSearchTxt = new javax.swing.JTextField();
+        searchAdmin = new javax.swing.JButton();
+        adminSortCmb = new javax.swing.JComboBox<>();
+        adminSearchCmb = new javax.swing.JComboBox<>();
+        adminSortBtn = new javax.swing.JButton();
+        clearAdminBtn = new javax.swing.JButton();
         addNewPanel = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -140,14 +180,20 @@ public class MainFrame extends javax.swing.JFrame {
         userViewPanel = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
         jScrollPane8 = new javax.swing.JScrollPane();
-        userView = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
+        userViewTbl = new javax.swing.JTable();
+        cartIDTxt = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        cartBtn = new javax.swing.JButton();
+        grandTotalView = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
         userCartPanel = new javax.swing.JPanel();
         jLabel19 = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        userCartTbl = new javax.swing.JTable();
+        jButton2 = new javax.swing.JButton();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        userCartTbl1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMaximumSize(new java.awt.Dimension(1200, 900));
@@ -161,26 +207,34 @@ public class MainFrame extends javax.swing.JFrame {
         selectPanel.setBackground(new java.awt.Color(3, 57, 108));
 
         selectAdmin.setText("ADIMIN");
+        selectAdmin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectAdminActionPerformed(evt);
+            }
+        });
 
         selectUser.setText("USER");
+        selectUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectUserActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout selectPanelLayout = new javax.swing.GroupLayout(selectPanel);
         selectPanel.setLayout(selectPanelLayout);
         selectPanelLayout.setHorizontalGroup(
             selectPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(selectUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(selectPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(selectAdmin, javax.swing.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE))
+            .addComponent(selectUser, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addComponent(selectAdmin, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         selectPanelLayout.setVerticalGroup(
             selectPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(selectPanelLayout.createSequentialGroup()
-                .addGap(251, 251, 251)
+                .addGap(250, 250, 250)
                 .addComponent(selectAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(100, 100, 100)
                 .addComponent(selectUser, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(349, Short.MAX_VALUE))
+                .addContainerGap(356, Short.MAX_VALUE))
         );
 
         navPanel.add(selectPanel, "card4");
@@ -248,7 +302,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(logo)
                 .addGap(154, 154, 154)
                 .addComponent(adminNavPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(389, Short.MAX_VALUE))
+                .addContainerGap(395, Short.MAX_VALUE))
         );
 
         navPanel.add(adminPanel, "card2");
@@ -257,11 +311,21 @@ public class MainFrame extends javax.swing.JFrame {
 
         userNavPanel.setLayout(new java.awt.GridLayout(2, 1));
 
-        jButton1.setText("View");
-        userNavPanel.add(jButton1);
+        userViewBtn.setText("View");
+        userViewBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userViewBtnActionPerformed(evt);
+            }
+        });
+        userNavPanel.add(userViewBtn);
 
-        jButton2.setText("Cart");
-        userNavPanel.add(jButton2);
+        useCartBtn.setText("Cart");
+        useCartBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useCartBtnActionPerformed(evt);
+            }
+        });
+        userNavPanel.add(useCartBtn);
 
         javax.swing.GroupLayout userPanelLayout = new javax.swing.GroupLayout(userPanel);
         userPanel.setLayout(userPanelLayout);
@@ -287,12 +351,10 @@ public class MainFrame extends javax.swing.JFrame {
         mainPanel.setLayout(new java.awt.CardLayout());
 
         adminLoginPanel.setBackground(new java.awt.Color(255, 255, 255));
+        adminLoginPanel.setPreferredSize(new java.awt.Dimension(803, 900));
 
         jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         jLabel17.setText("Admin Login");
-
-        adminPasswordTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        adminPasswordTxt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Password", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 14))); // NOI18N
 
         adminLoginBtn.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         adminLoginBtn.setText("LOGIN");
@@ -303,10 +365,25 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         adminUsernameTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        adminUsernameTxt.setText("admin");
         adminUsernameTxt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Username", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 14))); // NOI18N
-        adminUsernameTxt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adminUsernameTxtActionPerformed(evt);
+        adminUsernameTxt.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                adminUsernameTxtFocusGained(evt);
+            }
+        });
+
+        adminPasswordTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        adminPasswordTxt.setText("12345678");
+        adminPasswordTxt.setBorder(javax.swing.BorderFactory.createTitledBorder("Password"));
+        adminPasswordTxt.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                adminPasswordTxtFocusGained(evt);
+            }
+        });
+        adminPasswordTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                adminPasswordTxtKeyPressed(evt);
             }
         });
 
@@ -315,26 +392,29 @@ public class MainFrame extends javax.swing.JFrame {
         adminLoginPanelLayout.setHorizontalGroup(
             adminLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(adminLoginPanelLayout.createSequentialGroup()
-                .addGap(304, 304, 304)
-                .addGroup(adminLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(adminLoginBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(adminPasswordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel17)
-                    .addComponent(adminUsernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(303, Short.MAX_VALUE))
+                .addGap(255, 255, 255)
+                .addGroup(adminLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(adminPasswordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(adminUsernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(adminLoginBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, adminLoginPanelLayout.createSequentialGroup()
+                .addContainerGap(304, Short.MAX_VALUE)
+                .addComponent(jLabel17)
+                .addGap(303, 303, 303))
         );
         adminLoginPanelLayout.setVerticalGroup(
             adminLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(adminLoginPanelLayout.createSequentialGroup()
-                .addGap(225, 225, 225)
+                .addGap(250, 250, 250)
                 .addComponent(jLabel17)
                 .addGap(40, 40, 40)
-                .addComponent(adminUsernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(adminUsernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40)
-                .addComponent(adminPasswordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(50, 50, 50)
+                .addComponent(adminPasswordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40)
                 .addComponent(adminLoginBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(327, Short.MAX_VALUE))
+                .addContainerGap(292, Short.MAX_VALUE))
         );
 
         mainPanel.add(adminLoginPanel, "card7");
@@ -346,43 +426,60 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel13.setText("User Login");
 
         userUsernameTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        userUsernameTxt.setText("user");
         userUsernameTxt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Username", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 14))); // NOI18N
-
-        userPasswordTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        userPasswordTxt.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Password", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 14))); // NOI18N
+        userUsernameTxt.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                userUsernameTxtFocusGained(evt);
+            }
+        });
 
         userLoginBtn.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         userLoginBtn.setText("LOGIN");
+        userLoginBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userLoginBtnActionPerformed(evt);
+            }
+        });
+
+        userPasswordTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        userPasswordTxt.setText("jPasswordField1");
+        userPasswordTxt.setBorder(javax.swing.BorderFactory.createTitledBorder("Password"));
+        userPasswordTxt.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                userPasswordTxtFocusGained(evt);
+            }
+        });
 
         javax.swing.GroupLayout userLoginPanelLayout = new javax.swing.GroupLayout(userLoginPanel);
         userLoginPanel.setLayout(userLoginPanelLayout);
         userLoginPanelLayout.setHorizontalGroup(
             userLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userLoginPanelLayout.createSequentialGroup()
-                .addContainerGap(307, Short.MAX_VALUE)
-                .addGroup(userLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(userLoginBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(userLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(userUsernameTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(userPasswordTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(301, 301, 301))
             .addGroup(userLoginPanelLayout.createSequentialGroup()
-                .addGap(315, 315, 315)
-                .addComponent(jLabel13)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(userLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(userLoginPanelLayout.createSequentialGroup()
+                        .addGap(315, 315, 315)
+                        .addComponent(jLabel13))
+                    .addGroup(userLoginPanelLayout.createSequentialGroup()
+                        .addGap(252, 252, 252)
+                        .addGroup(userLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(userUsernameTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                            .addComponent(userPasswordTxt)
+                            .addComponent(userLoginBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(257, Short.MAX_VALUE))
         );
         userLoginPanelLayout.setVerticalGroup(
             userLoginPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userLoginPanelLayout.createSequentialGroup()
                 .addGap(250, 250, 250)
                 .addComponent(jLabel13)
-                .addGap(37, 37, 37)
-                .addComponent(userUsernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40)
-                .addComponent(userPasswordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(userUsernameTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40)
+                .addComponent(userPasswordTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40)
                 .addComponent(userLoginBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(315, Short.MAX_VALUE))
+                .addContainerGap(292, Short.MAX_VALUE))
         );
 
         mainPanel.add(userLoginPanel, "card6");
@@ -416,25 +513,84 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel11.setText("Dental Inventory Solutions");
 
+        adminSearchTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        adminSearchTxt.setText("Search");
+        adminSearchTxt.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                adminSearchTxtFocusGained(evt);
+            }
+        });
+
+        searchAdmin.setText("Search");
+        searchAdmin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchAdminActionPerformed(evt);
+            }
+        });
+
+        adminSortCmb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sort by ID", "Sort by Name", "Sort by Company", "Sort by Price", "Sort by Quantity", "Sort by Added Date" }));
+
+        adminSearchCmb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Search by ID", "Search by Name", "Search by Company" }));
+
+        adminSortBtn.setText("Sort");
+        adminSortBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                adminSortBtnActionPerformed(evt);
+            }
+        });
+
+        clearAdminBtn.setText("Clear");
+        clearAdminBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearAdminBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout ViewLayout = new javax.swing.GroupLayout(View);
         View.setLayout(ViewLayout);
         ViewLayout.setHorizontalGroup(
             ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(ViewLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 797, Short.MAX_VALUE)
+                    .addGroup(ViewLayout.createSequentialGroup()
+                        .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(ViewLayout.createSequentialGroup()
+                                .addComponent(adminSearchCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(clearAdminBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(adminSearchTxt))
+                        .addGap(156, 156, 156)
+                        .addComponent(adminSortCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(adminSortBtn)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(ViewLayout.createSequentialGroup()
                 .addGap(115, 115, 115)
                 .addComponent(jLabel11)
                 .addGap(0, 114, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ViewLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 797, Short.MAX_VALUE)
-                .addContainerGap())
         );
         ViewLayout.setVerticalGroup(
             ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ViewLayout.createSequentialGroup()
                 .addGap(50, 50, 50)
                 .addComponent(jLabel11)
-                .addGap(127, 127, 127)
+                .addGap(20, 20, 20)
+                .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(adminSearchTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(adminSortCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(adminSortBtn)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(searchAdmin)
+                    .addComponent(adminSearchCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(clearAdminBtn))
+                .addGap(52, 52, 52)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -784,7 +940,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel18.setText("Dental Inventory Solutions");
 
-        userView.setModel(new javax.swing.table.DefaultTableModel(
+        userViewTbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -803,28 +959,40 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane8.setViewportView(userView);
-        if (userView.getColumnModel().getColumnCount() > 0) {
-            userView.getColumnModel().getColumn(0).setResizable(false);
-            userView.getColumnModel().getColumn(0).setPreferredWidth(10);
-            userView.getColumnModel().getColumn(1).setResizable(false);
-            userView.getColumnModel().getColumn(3).setResizable(false);
+        jScrollPane8.setViewportView(userViewTbl);
+        if (userViewTbl.getColumnModel().getColumnCount() > 0) {
+            userViewTbl.getColumnModel().getColumn(0).setResizable(false);
+            userViewTbl.getColumnModel().getColumn(0).setPreferredWidth(10);
+            userViewTbl.getColumnModel().getColumn(1).setResizable(false);
+            userViewTbl.getColumnModel().getColumn(3).setResizable(false);
         }
 
-        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+        cartIDTxt.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cartIDTxt.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                jTextField1KeyPressed(evt);
+                cartIDTxtKeyPressed(evt);
             }
         });
 
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel16.setText("Enter ID");
 
-        jButton3.setText("Cart");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        cartBtn.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cartBtn.setText("Add to Cart");
+        cartBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                cartBtnActionPerformed(evt);
             }
         });
+
+        grandTotalView.setBackground(new java.awt.Color(255, 255, 255));
+        grandTotalView.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        grandTotalView.setText("Grand Total =");
+
+        jTextField2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        jLabel20.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel20.setText("Quantity");
 
         javax.swing.GroupLayout userViewPanelLayout = new javax.swing.GroupLayout(userViewPanel);
         userViewPanel.setLayout(userViewPanelLayout);
@@ -832,35 +1000,44 @@ public class MainFrame extends javax.swing.JFrame {
             userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userViewPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane8)
+                .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane8)
+                    .addGroup(userViewPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel16)
+                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(userViewPanelLayout.createSequentialGroup()
+                                .addGap(18, 24, Short.MAX_VALUE)
+                                .addComponent(jLabel18)
+                                .addGap(123, 123, 123))
+                            .addGroup(userViewPanelLayout.createSequentialGroup()
+                                .addGap(30, 30, 30)
+                                .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(40, 40, 40)
+                                .addComponent(jLabel20)
+                                .addGap(30, 30, 30)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(40, 40, 40)
+                                .addComponent(cartBtn)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(10, 10, 10)))))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userViewPanelLayout.createSequentialGroup()
-                .addGap(0, 55, Short.MAX_VALUE)
-                .addComponent(jLabel16)
-                .addGap(18, 18, 18)
-                .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(userViewPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel18)
-                        .addGap(115, 115, 115))
-                    .addGroup(userViewPanelLayout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton3)
-                        .addGap(53, 53, 53))))
         );
         userViewPanelLayout.setVerticalGroup(
             userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userViewPanelLayout.createSequentialGroup()
                 .addGap(50, 50, 50)
                 .addComponent(jLabel18)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel16))
-                    .addComponent(jButton3))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
+                .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
+                    .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel16)
+                    .addComponent(jLabel20)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cartBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(30, 30, 30)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -871,7 +1048,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel19.setText("Dental Inventory Solutions");
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        userCartTbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -890,14 +1067,45 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane7.setViewportView(jTable2);
-        if (jTable2.getColumnModel().getColumnCount() > 0) {
-            jTable2.getColumnModel().getColumn(0).setResizable(false);
-            jTable2.getColumnModel().getColumn(0).setPreferredWidth(10);
-            jTable2.getColumnModel().getColumn(1).setResizable(false);
-            jTable2.getColumnModel().getColumn(3).setResizable(false);
-            jTable2.getColumnModel().getColumn(5).setResizable(false);
-            jTable2.getColumnModel().getColumn(5).setHeaderValue("Status");
+        jScrollPane7.setViewportView(userCartTbl);
+        if (userCartTbl.getColumnModel().getColumnCount() > 0) {
+            userCartTbl.getColumnModel().getColumn(0).setResizable(false);
+            userCartTbl.getColumnModel().getColumn(0).setPreferredWidth(10);
+            userCartTbl.getColumnModel().getColumn(1).setResizable(false);
+            userCartTbl.getColumnModel().getColumn(3).setResizable(false);
+            userCartTbl.getColumnModel().getColumn(5).setResizable(false);
+            userCartTbl.getColumnModel().getColumn(5).setHeaderValue("Status");
+        }
+
+        jButton2.setText("Checkout");
+
+        userCartTbl1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Name", "Company", "Price", "Quantity", "Status"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, true, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane9.setViewportView(userCartTbl1);
+        if (userCartTbl1.getColumnModel().getColumnCount() > 0) {
+            userCartTbl1.getColumnModel().getColumn(0).setResizable(false);
+            userCartTbl1.getColumnModel().getColumn(0).setPreferredWidth(10);
+            userCartTbl1.getColumnModel().getColumn(1).setResizable(false);
+            userCartTbl1.getColumnModel().getColumn(3).setResizable(false);
+            userCartTbl1.getColumnModel().getColumn(5).setResizable(false);
+            userCartTbl1.getColumnModel().getColumn(5).setHeaderValue("Status");
         }
 
         javax.swing.GroupLayout userCartPanelLayout = new javax.swing.GroupLayout(userCartPanel);
@@ -905,12 +1113,15 @@ public class MainFrame extends javax.swing.JFrame {
         userCartPanelLayout.setHorizontalGroup(
             userCartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userCartPanelLayout.createSequentialGroup()
-                .addContainerGap(114, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel19)
                 .addGap(115, 115, 115))
             .addGroup(userCartPanelLayout.createSequentialGroup()
-                .addGap(49, 49, 49)
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 521, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
+                .addGroup(userCartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton2)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 757, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 757, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         userCartPanelLayout.setVerticalGroup(
@@ -918,9 +1129,13 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(userCartPanelLayout.createSequentialGroup()
                 .addGap(50, 50, 50)
                 .addComponent(jLabel19)
-                .addGap(92, 92, 92)
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(517, Short.MAX_VALUE))
+                .addGap(55, 55, 55)
+                .addComponent(jButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(57, 57, 57)
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         userActionsPanel.add(userCartPanel, "card3");
@@ -1163,21 +1378,237 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_upIDTextKeyPressed
 
-    private void adminUsernameTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminUsernameTxtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_adminUsernameTxtActionPerformed
-
     private void adminLoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminLoginBtnActionPerformed
         // TODO add your handling code here:
+        adminLogin();
+
     }//GEN-LAST:event_adminLoginBtnActionPerformed
 
-    private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
+    private void cartIDTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cartIDTxtKeyPressed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1KeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (cartIDTxt.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a Product ID", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Enter Quantity too", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_cartIDTxtKeyPressed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void cartBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cartBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+        String productId = cartIDTxt.getText().trim();
+        String quantityStr = jTextField2.getText().trim();
+        if (productId.isEmpty() || quantityStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter both Product ID and Quantity", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int quantity;
+        try {
+            quantity = Integer.parseInt(quantityStr);
+            if (quantity <= 0) {
+                JOptionPane.showMessageDialog(this, "Quantity must be a positive integer", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid quantity format", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try{
+
+            InventoryModel model = operations.findProductID(productId);
+
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "Product ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        LinkedList <InventoryModel> cartList = new LinkedList<>();
+        InventoryModel model = operations.findProductID(productId);
+        cartList.add(new InventoryModel(productId, 0.0, quantity));
+
+
+    }//GEN-LAST:event_cartBtnActionPerformed
+
+    private void selectAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAdminActionPerformed
+        // TODO add your handling code here:
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.show(mainPanel, "card5");
+    }//GEN-LAST:event_selectAdminActionPerformed
+
+    private void selectUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectUserActionPerformed
+        // TODO add your handling code here:
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.show(mainPanel, "card7");
+    }//GEN-LAST:event_selectUserActionPerformed
+
+    private void userViewBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userViewBtnActionPerformed
+        // TODO add your handling code here:
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.show(mainPanel, "card2");
+        Structures.loadInventoryListToTable(userViewTbl, this.list);
+    }//GEN-LAST:event_userViewBtnActionPerformed
+
+    private void useCartBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useCartBtnActionPerformed
+        // TODO add your handling code here:
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.show(mainPanel, "card3");
+
+    }//GEN-LAST:event_useCartBtnActionPerformed
+
+    private void userLoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userLoginBtnActionPerformed
+        // TODO add your handling code here:
+        try {
+            String username = userUsernameTxt.getText().trim();
+            String password = userPasswordTxt.getText().trim();
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both username and password", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            boolean isAuthenticated = operations.authenticateUser(username, password);
+            if (isAuthenticated) {
+                CardLayout card = (CardLayout) mainPanel.getLayout();
+                card.show(mainPanel, "card7");
+                CardLayout card2 = (CardLayout) navPanel.getLayout();
+                card2.show(navPanel, "card3");
+                Structures.loadInventoryListToTable(userViewTbl, this.list);
+                // Clear login fields
+                userUsernameTxt.setText("");
+                userPasswordTxt.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during login", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }//GEN-LAST:event_userLoginBtnActionPerformed
+
+    private void adminSortBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminSortBtnActionPerformed
+        // TODO add your handling code here:
+        try{
+            if(adminSortCmb.getSelectedItem().equals("Sort by ID")){
+                sorting.insertionSort(this.list,"ID");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+            }
+            else if(adminSortCmb.getSelectedItem().equals("Sort by Name")){
+                sorting.insertionSort(this.list,"Name");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+            }
+            else if(adminSortCmb.getSelectedItem().equals("Sort by Company")){
+                sorting.insertionSort(this.list,"Company");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+            }
+            else if(adminSortCmb.getSelectedItem().equals("Sort by Price")){
+                sorting.insertionSort(this.list,"Price");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+            }
+            else if(adminSortCmb.getSelectedItem().equals("Sort by Quantity")){
+                sorting.insertionSort(this.list,"Quantity");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+            }
+            else if(adminSortCmb.getSelectedItem().equals("Sort by Added Date")){
+                sorting.insertionSort(this.list,"Date");
+                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
+            }
+
+            else{
+                JOptionPane.showMessageDialog(this, "Please select a valid sort option", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "Error!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+    }//GEN-LAST:event_adminSortBtnActionPerformed
+
+    private void searchAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchAdminActionPerformed
+        // TODO add your handling code here:
+        String target=adminSearchTxt.getText();
+        LinkedList <InventoryModel> list = operations.getList();
+
+
+        if (target.isEmpty()){
+            JOptionPane.showMessageDialog(null, "Please enter a name to search", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (adminSearchCmb.getSelectedItem().equals("Search by ID")){
+            sorting.insertionSort(list, "ID");
+            int value = Searching.BinarySearchingID(list, target);
+            if (value==-1) {
+                JOptionPane.showMessageDialog(null, "ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            else{
+                Structures.loadValuetoTable(viewTableAdmin, list, value);
+            }
+        }
+        else if (adminSearchCmb.getSelectedItem().equals("Search by Name")){
+            sorting.insertionSort(list, "Name");
+            int value = Searching.BinarySearchingName(list, target);
+            if (value==-1) {
+                JOptionPane.showMessageDialog(null, "Name not found", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            else{
+                Structures.loadValuetoTable(viewTableAdmin, list, value);
+            }
+        }
+        else if (adminSearchCmb.getSelectedItem().equals("Search by Company")){
+            sorting.insertionSort(list, "Company");
+            int value = Searching.BinarySearchingCompany(list, target);
+            if (value==-1) {
+                JOptionPane.showMessageDialog(null, "Company not found", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            else{
+                List<Integer> results = Searching.BinarySearchingCompanyName(list, target);
+                structures.loadlistToTable(viewTableAdmin, list, results);
+            }
+        }
+
+    }//GEN-LAST:event_searchAdminActionPerformed
+
+    private void userPasswordTxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_userPasswordTxtFocusGained
+        // TODO add your handling code here:
+        userPasswordTxt.setText("");
+    }//GEN-LAST:event_userPasswordTxtFocusGained
+
+    private void adminPasswordTxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_adminPasswordTxtFocusGained
+        // TODO add your handling code here:
+        adminPasswordTxt.setText("");
+    }//GEN-LAST:event_adminPasswordTxtFocusGained
+
+    private void userUsernameTxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_userUsernameTxtFocusGained
+        // TODO add your handling code here:
+        userUsernameTxt.setText("");
+    }//GEN-LAST:event_userUsernameTxtFocusGained
+
+    private void adminUsernameTxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_adminUsernameTxtFocusGained
+        // TODO add your handling code here:
+        adminUsernameTxt.setText("");
+    }//GEN-LAST:event_adminUsernameTxtFocusGained
+
+    private void adminPasswordTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_adminPasswordTxtKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            adminLogin();
+        }
+    }//GEN-LAST:event_adminPasswordTxtKeyPressed
+
+    private void clearAdminBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAdminBtnActionPerformed
+        // TODO add your handling code here:
+        adminSearchTxt.setText("");
+    }//GEN-LAST:event_clearAdminBtnActionPerformed
+
+    private void adminSearchTxtFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_adminSearchTxtFocusGained
+        // TODO add your handling code here:
+        adminSearchTxt.setText("");
+    }//GEN-LAST:event_adminSearchTxtFocusGained
 
     /**
      * @param args the command line arguments
@@ -1221,8 +1652,15 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel adminLoginPanel;
     private javax.swing.JPanel adminNavPanel;
     private javax.swing.JPanel adminPanel;
-    private javax.swing.JTextField adminPasswordTxt;
+    private javax.swing.JPasswordField adminPasswordTxt;
+    private javax.swing.JComboBox<String> adminSearchCmb;
+    private javax.swing.JTextField adminSearchTxt;
+    private javax.swing.JButton adminSortBtn;
+    private javax.swing.JComboBox<String> adminSortCmb;
     private javax.swing.JTextField adminUsernameTxt;
+    private javax.swing.JButton cartBtn;
+    private javax.swing.JTextField cartIDTxt;
+    private javax.swing.JButton clearAdminBtn;
     private javax.swing.JButton deleteBtn;
     private javax.swing.JLabel deleteLabel;
     private javax.swing.JPanel deletePanel;
@@ -1231,9 +1669,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField deleteText;
     private javax.swing.JTable deleteViewTable;
     private javax.swing.Box.Filler filler1;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel grandTotalView;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1246,6 +1683,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1262,11 +1700,12 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JScrollPane jScrollPane9;
+    private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel logo;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JPanel navPanel;
+    private javax.swing.JButton searchAdmin;
     private javax.swing.JButton selectAdmin;
     private javax.swing.JPanel selectPanel;
     private javax.swing.JButton selectUser;
@@ -1286,16 +1725,20 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel updatePanel;
     private javax.swing.JButton updatePanelBtn;
     private javax.swing.JTable updateTable;
+    private javax.swing.JButton useCartBtn;
     private javax.swing.JPanel userActionsPanel;
     private javax.swing.JPanel userCartPanel;
+    private javax.swing.JTable userCartTbl;
+    private javax.swing.JTable userCartTbl1;
     private javax.swing.JButton userLoginBtn;
     private javax.swing.JPanel userLoginPanel;
     private javax.swing.JPanel userNavPanel;
     private javax.swing.JPanel userPanel;
-    private javax.swing.JTextField userPasswordTxt;
+    private javax.swing.JPasswordField userPasswordTxt;
     private javax.swing.JTextField userUsernameTxt;
-    private javax.swing.JTable userView;
+    private javax.swing.JButton userViewBtn;
     private javax.swing.JPanel userViewPanel;
+    private javax.swing.JTable userViewTbl;
     private javax.swing.JButton viewAllBtn;
     private javax.swing.JTable viewTableAdmin;
     // End of variables declaration//GEN-END:variables
