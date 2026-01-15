@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 
+
 /**
  *
  * @author Ripple Device
@@ -22,19 +23,29 @@ public class MainFrame extends javax.swing.JFrame {
 
     LinkedList<InventoryModel> list = new LinkedList<>();
     static int size =10;
-    static String [][] addNewStack = new String [size][6];
-    static String [][] updateStack = new String [size][6];
-    static String [][] deleteStack = new String [size][6];
+    SimpleStack addNewStack = new SimpleStack(size);
 
-    Admin admin = new Admin("1","admin","admin.gmail.com","admin123");
+    SimpleStack updateStack = new SimpleStack(size);
+    SimpleStack deleteStack = new SimpleStack(size);
+
+    SimpleQueue cartQueue = new SimpleQueue(size);
+
+    SimpleQueue approvalQueue = new SimpleQueue(size);
+    SimpleStack approvalHistStack = new SimpleStack(size);
+
+    SimpleStack userCartHistStack = new SimpleStack(size);
 
 
+    Admin admin = new Admin("admin", "Ishan Maharjan", "ishan@gmail.com","admin123");
+    User user = new User("user", "user123", "Javier Don");
     Operations operations = new Operations();
 
     Structures structures = new Structures();
     Sorting sorting = new Sorting();
 
     ImageIcon originalIcon = new ImageIcon("images//logo.png");
+
+    ImageIcon icon = new ImageIcon("images//logo2.png");
 
     // Scale the image (width, height, hints)
     Image scaledImage = originalIcon.getImage().getScaledInstance(
@@ -94,6 +105,115 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    private void userLogin(){
+        try {
+            String username = userUsernameTxt.getText().trim();
+            String password = userPasswordTxt.getText().trim();
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter both username and password", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            boolean isAuthenticated = operations.authenticateUser(username, password);
+            if (isAuthenticated) {
+                CardLayout card = (CardLayout) mainPanel.getLayout();
+                card.show(mainPanel, "card8");
+                CardLayout card2 = (CardLayout) navPanel.getLayout();
+                card2.show(navPanel, "card3");
+                Structures.loadInventoryListToTable(userViewTbl, this.list);
+                // Clear login fields
+                userUsernameTxt.setText("");
+                userPasswordTxt.setText("");
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during login", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+    public void searchAction(String target, JTable table, JComboBox<String> searchCmb){
+        try{
+            LinkedList <InventoryModel> list = operations.getList();
+
+            if (target.isEmpty()){
+                JOptionPane.showMessageDialog(null, "Please enter a name to search", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (searchCmb.getSelectedItem().equals("Search by ID")){
+                sorting.insertionSort(list, "ID");
+                int value = Searching.BinarySearchingID(list, target);
+                if (value==-1) {
+                    JOptionPane.showMessageDialog(null, "ID not found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                else{
+                    Structures.loadValuetoTable(table, list, value);
+                }
+            }
+            else if (searchCmb.getSelectedItem().equals("Search by Name")){
+                sorting.insertionSort(list, "Name");
+                int value = Searching.BinarySearchingName(list, target);
+                if (value==-1) {
+                    JOptionPane.showMessageDialog(null, "Name not found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                else{
+                    Structures.loadValuetoTable(table, list, value);
+                }
+            }
+            else if (searchCmb.getSelectedItem().equals("Search by Company")){
+                sorting.insertionSort(list, "Company");
+                int value = Searching.BinarySearchingCompany(list, target);
+                if (value==-1) {
+                    JOptionPane.showMessageDialog(null, "Company not found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                else{
+                    List<Integer> results = Searching.BinarySearchingCompanyName(list, target);
+                    structures.loadlistToTable(table, list, results);
+                }
+            }
+        }catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during searching", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+    }
+
+    public void sortAction(JTable table, JComboBox<String> sortCmb, boolean ascending){
+        LinkedList <InventoryModel> list = operations.getList();
+        try {
+            if (sortCmb.getSelectedItem().equals("Sort by ID")) {
+                sorting.insertionSort(list, "ID");
+            } else if (sortCmb.getSelectedItem().equals("Sort by Name")) {
+                sorting.insertionSort(list, "Name");
+            } else if (sortCmb.getSelectedItem().equals("Sort by Price")) {
+                sorting.insertionSort(list, "Price");
+            } else if (sortCmb.getSelectedItem().equals("Sort by Quantity")) {
+                sorting.insertionSort(list, "Quantity");
+            } else if (sortCmb.getSelectedItem().equals("Sort by Company")) {
+                sorting.insertionSort(list, "Company");
+            } else if (sortCmb.getSelectedItem().equals("Sort by Date")) {
+                sorting.insertionSort(list, "Date");
+            }
+
+            if (!ascending) {
+                LinkedList<InventoryModel> reversedList = new LinkedList<>();
+                for (int i = list.size() - 1; i >= 0; i--) {
+                    reversedList.add(list.get(i));
+                }
+                list = reversedList;
+            }
+
+            Structures.loadInventoryListToTable(table, list);
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during sorting", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -103,8 +223,6 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
-        jButton4 = new javax.swing.JButton();
         navPanel = new javax.swing.JPanel();
         selectPanel = new javax.swing.JPanel();
         selectAdmin = new javax.swing.JButton();
@@ -116,6 +234,7 @@ public class MainFrame extends javax.swing.JFrame {
         addNewPanelBtn = new javax.swing.JButton();
         updatePanelBtn = new javax.swing.JButton();
         deletePanelBtn = new javax.swing.JButton();
+        approvePanelBtn = new javax.swing.JButton();
         logo = new javax.swing.JLabel(scaledIcon);
         adminLogoutBtn = new javax.swing.JButton();
         userPanel = new javax.swing.JPanel();
@@ -145,9 +264,9 @@ public class MainFrame extends javax.swing.JFrame {
         searchAdmin = new javax.swing.JButton();
         adminSortCmb = new javax.swing.JComboBox<>();
         adminSearchCmb = new javax.swing.JComboBox<>();
-        adminSortBtn = new javax.swing.JButton();
+        adminAscSortBtn = new javax.swing.JButton();
         clearAdminBtn = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        adminDescSortBtn = new javax.swing.JButton();
         addNewPanel = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -167,6 +286,7 @@ public class MainFrame extends javax.swing.JFrame {
         addQntText = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         addDateText = new javax.swing.JTextField();
+        addNewClearBtn = new javax.swing.JButton();
         updatePanel = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         updateBtn = new javax.swing.JButton();
@@ -186,6 +306,7 @@ public class MainFrame extends javax.swing.JFrame {
         upDateLabel = new javax.swing.JLabel();
         upDateText = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
+        updateClearBtn = new javax.swing.JButton();
         deletePanel = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
         deleteText = new javax.swing.JTextField();
@@ -197,6 +318,17 @@ public class MainFrame extends javax.swing.JFrame {
         deleteViewTable = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
+        clearDeleteHistoryBtn = new javax.swing.JButton();
+        approvePanel = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        approvalTable = new javax.swing.JTable();
+        approveBtn = new javax.swing.JButton();
+        jLabel24 = new javax.swing.JLabel();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        approvalHistoryTable = new javax.swing.JTable();
+        adminApprovalClearAllBtn = new javax.swing.JButton();
+        adminApprovalClearBtn = new javax.swing.JButton();
+        approveAllBtn = new javax.swing.JButton();
         userActionsPanel = new javax.swing.JPanel();
         userViewPanel = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
@@ -208,19 +340,26 @@ public class MainFrame extends javax.swing.JFrame {
         grandTotalView = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jLabel20 = new javax.swing.JLabel();
+        clearUserBtn = new javax.swing.JButton();
+        userSearchCmb1 = new javax.swing.JComboBox<>();
+        userSearchBtn = new javax.swing.JButton();
+        userSearchTxt1 = new javax.swing.JTextField();
+        userSortCmb1 = new javax.swing.JComboBox<>();
+        userAscSortBtn1 = new javax.swing.JButton();
+        userDescSortBtn = new javax.swing.JButton();
         userCartPanel = new javax.swing.JPanel();
         jLabel19 = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
         userCartTbl = new javax.swing.JTable();
-        jButton2 = new javax.swing.JButton();
+        yserCheckoutBtn = new javax.swing.JButton();
         jScrollPane9 = new javax.swing.JScrollPane();
-        userCartTbl1 = new javax.swing.JTable();
-
-        jButton4.setText("jButton4");
+        userCartHistoryTbl = new javax.swing.JTable();
+        userClearCheckoutBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Dental Inventory Solutions");
         setBackground(new java.awt.Color(255, 255, 255));
-        setMaximumSize(new java.awt.Dimension(1100, 900));
+        setIconImage(icon.getImage());
         setMinimumSize(new java.awt.Dimension(1100, 900));
         setResizable(false);
         setSize(new java.awt.Dimension(1100, 900));
@@ -282,7 +421,7 @@ public class MainFrame extends javax.swing.JFrame {
         adminPanel.setMaximumSize(new java.awt.Dimension(300, 32767));
         adminPanel.setPreferredSize(new java.awt.Dimension(300, 900));
 
-        adminNavPanel.setLayout(new java.awt.GridLayout(4, 1));
+        adminNavPanel.setLayout(new java.awt.GridLayout(5, 1));
 
         viewAllBtn.setText("View All Products");
         viewAllBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -315,6 +454,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         adminNavPanel.add(deletePanelBtn);
+
+        approvePanelBtn.setText("Approve Checkouts");
+        approvePanelBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                approvePanelBtnActionPerformed(evt);
+            }
+        });
+        adminNavPanel.add(approvePanelBtn);
 
         logo.setText("logo");
 
@@ -532,6 +679,11 @@ public class MainFrame extends javax.swing.JFrame {
                 userPasswordTxtFocusGained(evt);
             }
         });
+        userPasswordTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                userPasswordTxtKeyPressed(evt);
+            }
+        });
 
         javax.swing.GroupLayout userLoginPanelLayout = new javax.swing.GroupLayout(userLoginPanel);
         userLoginPanel.setLayout(userLoginPanelLayout);
@@ -572,6 +724,7 @@ public class MainFrame extends javax.swing.JFrame {
         View.setBackground(new java.awt.Color(179, 205, 224));
         View.setPreferredSize(new java.awt.Dimension(800, 900));
 
+        viewTableAdmin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         viewTableAdmin.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -615,10 +768,10 @@ public class MainFrame extends javax.swing.JFrame {
 
         adminSearchCmb.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Search by ID", "Search by Name", "Search by Company" }));
 
-        adminSortBtn.setText("Ascending");
-        adminSortBtn.addActionListener(new java.awt.event.ActionListener() {
+        adminAscSortBtn.setText("Ascending");
+        adminAscSortBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adminSortBtnActionPerformed(evt);
+                adminAscSortBtnActionPerformed(evt);
             }
         });
 
@@ -629,7 +782,12 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Descending ");
+        adminDescSortBtn.setText("Descending ");
+        adminDescSortBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                adminDescSortBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout ViewLayout = new javax.swing.GroupLayout(View);
         View.setLayout(ViewLayout);
@@ -651,9 +809,9 @@ public class MainFrame extends javax.swing.JFrame {
                         .addGap(156, 156, 156)
                         .addComponent(adminSortCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(adminSortBtn)
+                        .addComponent(adminAscSortBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
+                        .addComponent(adminDescSortBtn)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(ViewLayout.createSequentialGroup()
@@ -671,8 +829,8 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(adminSearchTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(adminSortCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(adminSortBtn)
-                        .addComponent(jButton1)))
+                        .addComponent(adminAscSortBtn)
+                        .addComponent(adminDescSortBtn)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(ViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(adminSearchCmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -703,6 +861,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        addNewTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         addNewTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -751,26 +910,34 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.add(jLabel8);
         jPanel2.add(addDateText);
 
+        addNewClearBtn.setText("Clear");
+        addNewClearBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addNewClearBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout addNewPanelLayout = new javax.swing.GroupLayout(addNewPanel);
         addNewPanel.setLayout(addNewPanelLayout);
         addNewPanelLayout.setHorizontalGroup(
             addNewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addNewPanelLayout.createSequentialGroup()
-                .addGap(180, 180, 180)
-                .addGroup(addNewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addNewPanelLayout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(addNewBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(81, 81, 81))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addNewPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(300, 300, 300))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5)
+                .addGap(300, 300, 300))
             .addGroup(addNewPanelLayout.createSequentialGroup()
                 .addGap(110, 110, 110)
                 .addComponent(jLabel12)
-                .addGap(110, 110, 110))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, addNewPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(addNewClearBtn)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(addNewBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(81, 81, 81))
         );
         addNewPanelLayout.setVerticalGroup(
             addNewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -782,7 +949,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(addNewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addNewBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(addNewBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(addNewClearBtn))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
         );
@@ -804,6 +972,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        updateTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         updateTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -872,12 +1041,21 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel15.setText("Dental Inventory Solutions");
 
+        updateClearBtn.setText("Clear");
+        updateClearBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateClearBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout updatePanelLayout = new javax.swing.GroupLayout(updatePanel);
         updatePanel.setLayout(updatePanelLayout);
         updatePanelLayout.setHorizontalGroup(
             updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(updatePanelLayout.createSequentialGroup()
-                .addGap(180, 180, 180)
+                .addContainerGap()
+                .addComponent(updateClearBtn)
+                .addGap(102, 102, 102)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(updateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -903,7 +1081,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(updateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(updateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(updateClearBtn))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE))
         );
@@ -916,6 +1095,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel14.setText("Dental Inventory Solutions");
 
+        deleteTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         deleteTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -942,6 +1122,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        deleteViewTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         deleteViewTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -963,6 +1144,13 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel10.setText("List of all products");
 
+        clearDeleteHistoryBtn.setText("Clear");
+        clearDeleteHistoryBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearDeleteHistoryBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout deletePanelLayout = new javax.swing.GroupLayout(deletePanel);
         deletePanel.setLayout(deletePanelLayout);
         deletePanelLayout.setHorizontalGroup(
@@ -970,20 +1158,22 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(deletePanelLayout.createSequentialGroup()
                 .addGroup(deletePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(deletePanelLayout.createSequentialGroup()
+                        .addGap(47, 47, 47)
+                        .addComponent(deleteLabel)
+                        .addGap(41, 41, 41)
+                        .addComponent(deleteText, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(35, 35, 35)
+                        .addComponent(deleteBtn))
+                    .addGroup(deletePanelLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(deletePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(deletePanelLayout.createSequentialGroup()
-                                .addGap(47, 47, 47)
-                                .addComponent(deleteLabel)
-                                .addGap(41, 41, 41)
-                                .addComponent(deleteText, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(35, 35, 35)
-                                .addComponent(deleteBtn))
+                                .addComponent(jLabel10)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(deletePanelLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(deletePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel10))))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(clearDeleteHistoryBtn))))
                     .addGroup(deletePanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(deletePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1005,18 +1195,140 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(deleteLabel)
                     .addComponent(deleteText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(deleteBtn))
-                .addGap(7, 7, 7)
-                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(deletePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1)
+                    .addComponent(clearDeleteHistoryBtn))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(68, 68, 68)
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         adminActionsPanel.add(deletePanel, "card5");
+
+        approvePanel.setBackground(new java.awt.Color(179, 205, 224));
+
+        approvalTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        approvalTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Name", "Company Name", "Price", "Quantity", "Date"
+            }
+        ));
+        jScrollPane6.setViewportView(approvalTable);
+        if (approvalTable.getColumnModel().getColumnCount() > 0) {
+            approvalTable.getColumnModel().getColumn(0).setResizable(false);
+            approvalTable.getColumnModel().getColumn(0).setPreferredWidth(10);
+            approvalTable.getColumnModel().getColumn(3).setResizable(false);
+            approvalTable.getColumnModel().getColumn(3).setPreferredWidth(10);
+        }
+
+        approveBtn.setText("Approve");
+        approveBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                approveBtnActionPerformed(evt);
+            }
+        });
+
+        jLabel24.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
+        jLabel24.setText("Dental Inventory Solutions");
+
+        approvalHistoryTable.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        approvalHistoryTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID", "Name", "Company Name", "Price", "Quantity", "Date"
+            }
+        ));
+        jScrollPane10.setViewportView(approvalHistoryTable);
+        if (approvalHistoryTable.getColumnModel().getColumnCount() > 0) {
+            approvalHistoryTable.getColumnModel().getColumn(0).setResizable(false);
+            approvalHistoryTable.getColumnModel().getColumn(0).setPreferredWidth(10);
+            approvalHistoryTable.getColumnModel().getColumn(3).setResizable(false);
+            approvalHistoryTable.getColumnModel().getColumn(3).setPreferredWidth(10);
+        }
+
+        adminApprovalClearAllBtn.setText("Clear History");
+        adminApprovalClearAllBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                adminApprovalClearAllBtnActionPerformed(evt);
+            }
+        });
+
+        adminApprovalClearBtn.setText("Clear");
+        adminApprovalClearBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                adminApprovalClearBtnActionPerformed(evt);
+            }
+        });
+
+        approveAllBtn.setText("Approve All");
+        approveAllBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                approveAllBtnActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout approvePanelLayout = new javax.swing.GroupLayout(approvePanel);
+        approvePanel.setLayout(approvePanelLayout);
+        approvePanelLayout.setHorizontalGroup(
+            approvePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane6)
+            .addComponent(jScrollPane10)
+            .addGroup(approvePanelLayout.createSequentialGroup()
+                .addGroup(approvePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, approvePanelLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(adminApprovalClearBtn)
+                        .addGap(51, 51, 51)
+                        .addComponent(adminApprovalClearAllBtn))
+                    .addGroup(approvePanelLayout.createSequentialGroup()
+                        .addGap(110, 110, 110)
+                        .addComponent(jLabel24)
+                        .addGap(0, 104, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(approvePanelLayout.createSequentialGroup()
+                .addGap(300, 300, 300)
+                .addComponent(approveBtn)
+                .addGap(33, 33, 33)
+                .addComponent(approveAllBtn)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        approvePanelLayout.setVerticalGroup(
+            approvePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, approvePanelLayout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(jLabel24)
+                .addGap(38, 38, 38)
+                .addGroup(approvePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(approveBtn)
+                    .addComponent(approveAllBtn))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
+                .addGroup(approvePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(adminApprovalClearBtn)
+                    .addComponent(adminApprovalClearAllBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        adminActionsPanel.add(approvePanel, "card6");
 
         mainPanel.add(adminActionsPanel, "card5");
 
@@ -1030,6 +1342,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel18.setText("Dental Inventory Solutions");
 
+        userViewTbl.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         userViewTbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -1084,41 +1397,95 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel20.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel20.setText("Quantity");
 
+        clearUserBtn.setText("Clear");
+        clearUserBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearUserBtnActionPerformed(evt);
+            }
+        });
+
+        userSearchCmb1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Search by ID", "Search by Name", "Search by Company" }));
+
+        userSearchBtn.setText("Search");
+        userSearchBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userSearchBtnActionPerformed(evt);
+            }
+        });
+
+        userSearchTxt1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        userSearchTxt1.setText("Search");
+        userSearchTxt1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                userSearchTxt1FocusGained(evt);
+            }
+        });
+
+        userSortCmb1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sort by ID", "Sort by Name", "Sort by Company", "Sort by Price", "Sort by Quantity", "Sort by Added Date" }));
+
+        userAscSortBtn1.setText("Ascending");
+        userAscSortBtn1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userAscSortBtn1ActionPerformed(evt);
+            }
+        });
+
+        userDescSortBtn.setText("Descending ");
+        userDescSortBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userDescSortBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout userViewPanelLayout = new javax.swing.GroupLayout(userViewPanel);
         userViewPanel.setLayout(userViewPanelLayout);
         userViewPanelLayout.setHorizontalGroup(
             userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userViewPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel18)
+                .addGap(110, 110, 110))
             .addGroup(userViewPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane8)
                     .addGroup(userViewPanelLayout.createSequentialGroup()
                         .addComponent(jLabel16)
-                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(30, 30, 30)
+                        .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(40, 40, 40)
+                        .addComponent(jLabel20)
+                        .addGap(30, 30, 30)
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(40, 40, 40)
+                        .addComponent(cartBtn)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                        .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10))
+                    .addGroup(userViewPanelLayout.createSequentialGroup()
+                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(userViewPanelLayout.createSequentialGroup()
-                                .addGap(18, 48, Short.MAX_VALUE)
-                                .addComponent(jLabel18)
-                                .addGap(110, 110, 110))
-                            .addGroup(userViewPanelLayout.createSequentialGroup()
-                                .addGap(30, 30, 30)
-                                .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(40, 40, 40)
-                                .addComponent(jLabel20)
-                                .addGap(30, 30, 30)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(40, 40, 40)
-                                .addComponent(cartBtn)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)))))
+                                .addComponent(userSearchCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(userSearchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(clearUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(userSearchTxt1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(156, 156, 156)
+                        .addComponent(userSortCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(userAscSortBtn1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(userDescSortBtn)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         userViewPanelLayout.setVerticalGroup(
             userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(userViewPanelLayout.createSequentialGroup()
-                .addGap(50, 50, 50)
+                .addGap(49, 49, 49)
                 .addComponent(jLabel18)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
                 .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
                     .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel16)
@@ -1126,8 +1493,21 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cartBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30)
-                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 650, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(userSearchTxt1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(userSortCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(userAscSortBtn1)
+                        .addComponent(userDescSortBtn)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(userSearchCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(userSearchBtn)
+                        .addComponent(clearUserBtn)))
+                .addGap(50, 50, 50)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 540, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -1139,6 +1519,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel19.setText("Dental Inventory Solutions");
 
+        userCartTbl.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         userCartTbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
@@ -1168,9 +1549,15 @@ public class MainFrame extends javax.swing.JFrame {
             userCartTbl.getColumnModel().getColumn(5).setHeaderValue("Status");
         }
 
-        jButton2.setText("Checkout");
+        yserCheckoutBtn.setText("Checkout");
+        yserCheckoutBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                yserCheckoutBtnActionPerformed(evt);
+            }
+        });
 
-        userCartTbl1.setModel(new javax.swing.table.DefaultTableModel(
+        userCartHistoryTbl.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        userCartHistoryTbl.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null},
                 {null, null, null, null, null, null},
@@ -1189,15 +1576,22 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane9.setViewportView(userCartTbl1);
-        if (userCartTbl1.getColumnModel().getColumnCount() > 0) {
-            userCartTbl1.getColumnModel().getColumn(0).setResizable(false);
-            userCartTbl1.getColumnModel().getColumn(0).setPreferredWidth(10);
-            userCartTbl1.getColumnModel().getColumn(1).setResizable(false);
-            userCartTbl1.getColumnModel().getColumn(3).setResizable(false);
-            userCartTbl1.getColumnModel().getColumn(5).setResizable(false);
-            userCartTbl1.getColumnModel().getColumn(5).setHeaderValue("Status");
+        jScrollPane9.setViewportView(userCartHistoryTbl);
+        if (userCartHistoryTbl.getColumnModel().getColumnCount() > 0) {
+            userCartHistoryTbl.getColumnModel().getColumn(0).setResizable(false);
+            userCartHistoryTbl.getColumnModel().getColumn(0).setPreferredWidth(10);
+            userCartHistoryTbl.getColumnModel().getColumn(1).setResizable(false);
+            userCartHistoryTbl.getColumnModel().getColumn(3).setResizable(false);
+            userCartHistoryTbl.getColumnModel().getColumn(5).setResizable(false);
+            userCartHistoryTbl.getColumnModel().getColumn(5).setHeaderValue("Status");
         }
+
+        userClearCheckoutBtn.setText("Clear");
+        userClearCheckoutBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                userClearCheckoutBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout userCartPanelLayout = new javax.swing.GroupLayout(userCartPanel);
         userCartPanel.setLayout(userCartPanelLayout);
@@ -1208,12 +1602,19 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jLabel19)
                 .addGap(110, 110, 110))
             .addGroup(userCartPanelLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(702, 702, 702)
                 .addGroup(userCartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton2)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 757, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 757, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(userClearCheckoutBtn)
+                    .addComponent(yserCheckoutBtn))
+                .addContainerGap(17, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userCartPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane7)
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userCartPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane9)
+                .addContainerGap())
         );
         userCartPanelLayout.setVerticalGroup(
             userCartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1221,10 +1622,12 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(50, 50, 50)
                 .addComponent(jLabel19)
                 .addGap(55, 55, 55)
-                .addComponent(jButton2)
+                .addComponent(yserCheckoutBtn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(57, 57, 57)
+                .addGap(16, 16, 16)
+                .addComponent(userClearCheckoutBtn)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(13, Short.MAX_VALUE))
         );
@@ -1266,7 +1669,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void addNewBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewBtnActionPerformed
         // TODO add your handling code here:
         //Btn to add new product to list
-        
+
         String id = addIDText.getText().trim();
         String name = addNameText.getText().trim();
         String company = addCpNameText.getText().trim();
@@ -1294,14 +1697,14 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Product added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
 
             //push to add history stack
-            String [][] value =Structures.pushToStack(addNewStack,id, name, company, Double.parseDouble(price),Integer.parseInt(quantity), date);
+            addNewStack.push(id, name, company, Double.parseDouble(price),Integer.parseInt(quantity), date);
 
             int rowCount = addNewTable.getRowCount();
-            if(rowCount==size-1)
+            if(rowCount==size-1||addNewStack.isFull()){
                 JOptionPane.showMessageDialog(this, "Add new product history is full, clear list to add more", "Error", JOptionPane.ERROR_MESSAGE);
-            else
-                addNewStack= value;
-            Structures.loadFromStack(addNewTable,addNewStack);
+                return;
+            }
+            Structures.loadFromStack(addNewTable,addNewStack.getStackData(),addNewStack.getTop());
 
 
             //Clear the text fields after adding
@@ -1312,14 +1715,14 @@ public class MainFrame extends javax.swing.JFrame {
             addQntText.setText("");
             addDateText.setText("");
         }
-       
+
     }//GEN-LAST:event_addNewBtnActionPerformed
 
     private void updatePanelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatePanelBtnActionPerformed
         // TODO add your handling code here:
         CardLayout card = (CardLayout)adminActionsPanel.getLayout();
         card.show(adminActionsPanel, "card4");
-        Structures.loadFromStack(updateTable, updateStack);
+        Structures.loadFromStack(updateTable, updateStack.getStackData(),updateStack.getTop());
     }//GEN-LAST:event_updatePanelBtnActionPerformed
 
     private void viewAllBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewAllBtnActionPerformed
@@ -1333,9 +1736,9 @@ public class MainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         CardLayout card = (CardLayout)adminActionsPanel.getLayout();
         card.show(adminActionsPanel, "card5");
-        Structures.loadFromStack(deleteTable, deleteStack);
+        Structures.loadFromStack(deleteTable, deleteStack.getStackData(),deleteStack.getTop());
         Structures.loadInventoryListToTable(deleteViewTable, list);
-        
+
     }//GEN-LAST:event_deletePanelBtnActionPerformed
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
@@ -1358,24 +1761,22 @@ public class MainFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Product ID not found", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-
+            int rowCount = deleteTable.getRowCount();
+            if(rowCount==size-1||deleteStack.isFull()){
+                JOptionPane.showMessageDialog(this, "Delete history is full, remove product from history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             InventoryModel model = new InventoryModel(l.getProductID(), l.getProductName(), l.getProductCompany(), l.getProductPrice(), l.getProductQuantity(), l.getAddedDate());
             operations.deleteProduct(l,deletePanel);
 
-            //push to add history stack
-            String [][] value = Structures.pushToStack(deleteStack,model.getProductID(), model.getProductName(), model.getProductCompany(), model.getProductPrice(), model.getProductQuantity(), model.getAddedDate());
+            //push to delete history stack
+            deleteStack.push(model.getProductID(), model.getProductName(), model.getProductCompany(), model.getProductPrice(), model.getProductQuantity(), model.getAddedDate());
 
-            int rowCount = deleteTable.getRowCount();
-            if(rowCount==size-1)
-                JOptionPane.showMessageDialog(this, "Delete history is full, remove product from history to continue", "Error", JOptionPane.ERROR_MESSAGE);
-            else
-                deleteStack= value;
             this.list=operations.getList();
-            Structures.loadFromStack(deleteTable,deleteStack);
+            Structures.loadFromStack(deleteTable,deleteStack.getStackData(),deleteStack.getTop());
             Structures.loadInventoryListToTable(deleteViewTable, this.list);
             //Logic to delete product from the list
-            
+
         }catch (NullPointerException e){
             logger.log(java.util.logging.Level.SEVERE, null, e);
             JOptionPane.showMessageDialog(this, "Prodcut ID not found", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1397,21 +1798,22 @@ public class MainFrame extends javax.swing.JFrame {
         boolean success;
 
         try{
+            int rowCount = updateTable.getRowCount();
+            if(rowCount==size-1){
+                JOptionPane.showMessageDialog(this, "Update history is full, clear list to add more", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             success=operations.updateProduct(updatePanel,id, name, company, price, quantity, date);
-            
+
             if (success){
                 this.list=operations.getList();
                 Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-                JOptionPane.showMessageDialog(this, "Product upated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Product updated successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
                 //push to add history stack
-                String [][] value =Structures.pushToStack(updateStack,id, name, company, Double.parseDouble(price), Integer.parseInt(quantity), date);
+                updateStack.push(id, name, company, Double.parseDouble(price), Integer.parseInt(quantity), date);
 
-                int rowCount = updateTable.getRowCount();
-                if(rowCount==size-1)
-                    JOptionPane.showMessageDialog(this, "Update history is full, clear list to add more", "Error", JOptionPane.ERROR_MESSAGE);
-                else
-                    updateStack= value;
-                Structures.loadFromStack(updateTable,updateStack);
+                Structures.loadFromStack(updateTable,updateStack.getStackData(),updateStack.getTop());
 
                 //Clear the text fields after updating
                 upIDText.setText("");
@@ -1421,7 +1823,7 @@ public class MainFrame extends javax.swing.JFrame {
                 upQntText.setText("");
                 upDateText.setText("");
             }
-            
+
         }
         catch (NullPointerException e){
             logger.log(java.util.logging.Level.SEVERE, null, e);
@@ -1488,6 +1890,8 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_cartIDTxtKeyPressed
 
+
+
     private void cartBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cartBtnActionPerformed
         // TODO add your handling code here:
         String productId = cartIDTxt.getText().trim();
@@ -1516,9 +1920,18 @@ public class MainFrame extends javax.swing.JFrame {
                     return;
                 }
 
-                LinkedList <InventoryModel> cartList = new LinkedList<>();
-                cartList.add(new InventoryModel(model.getProductID(), model.getProductName(), model.getProductPrice(), quantity, "pending"));
-                Structures.loadCartToTable(userCartTbl, cartList);
+                LinkedList <InventoryModel> cartList = user.getUserCart();
+                cartList.add(new InventoryModel(model.getProductID(), model.getProductName(), model.getProductCompany(), model.getProductPrice(), quantity, operations.getCurrentDate()));
+                user.setUserCart(cartList);
+                cartQueue.enqueue(model.getProductID(), model.getProductName(), model.getProductCompany(),model.getProductPrice(), quantity, "Pending");
+                int rowCount = approvalTable.getRowCount();
+                if(rowCount==size-1||approvalQueue.isFull()){
+                    JOptionPane.showMessageDialog(this, "Approval Queue is full, please wait", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Structures.loadFromQueue(userCartTbl, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+
                 grandTotalView.setText("Grand Total = " + operations.calculateTotalInventoryValue(cartList));
             }
         }
@@ -1553,119 +1966,25 @@ public class MainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         CardLayout card = (CardLayout)userActionsPanel.getLayout();
         card.show(userActionsPanel, "card3");
+        Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), approvalHistStack.getTop());
+        Structures.loadFromQueue(userCartTbl, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
 
     }//GEN-LAST:event_useCartBtnActionPerformed
 
     private void userLoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userLoginBtnActionPerformed
         // TODO add your handling code here:
-        try {
-            String username = userUsernameTxt.getText().trim();
-            String password = userPasswordTxt.getText().trim();
-            if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter both username and password", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            boolean isAuthenticated = operations.authenticateUser(username, password);
-            if (isAuthenticated) {
-                CardLayout card = (CardLayout) mainPanel.getLayout();
-                card.show(mainPanel, "card8");
-                CardLayout card2 = (CardLayout) navPanel.getLayout();
-                card2.show(navPanel, "card3");
-                Structures.loadInventoryListToTable(userViewTbl, this.list);
-                // Clear login fields
-                userUsernameTxt.setText("");
-                userPasswordTxt.setText("");
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        catch (NullPointerException e){
-            logger.log(java.util.logging.Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(this, "An error occurred during login", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        userLogin();
     }//GEN-LAST:event_userLoginBtnActionPerformed
 
-    private void adminSortBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminSortBtnActionPerformed
+    private void adminAscSortBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminAscSortBtnActionPerformed
         // TODO add your handling code here:
-        try{
-            if(adminSortCmb.getSelectedItem().equals("Sort by ID")){
-                sorting.insertionSort(this.list,"ID");
-                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-            }
-            else if(adminSortCmb.getSelectedItem().equals("Sort by Name")){
-                sorting.insertionSort(this.list,"Name");
-                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-            }
-            else if(adminSortCmb.getSelectedItem().equals("Sort by Company")){
-                sorting.insertionSort(this.list,"Company");
-                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-            }
-            else if(adminSortCmb.getSelectedItem().equals("Sort by Price")){
-                sorting.insertionSort(this.list,"Price");
-                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-            }
-            else if(adminSortCmb.getSelectedItem().equals("Sort by Quantity")){
-                sorting.insertionSort(this.list,"Quantity");
-                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-            }
-            else if(adminSortCmb.getSelectedItem().equals("Sort by Added Date")){
-                sorting.insertionSort(this.list,"Date");
-                Structures.loadInventoryListToTable(viewTableAdmin, this.list);
-            }
+        sortAction(viewTableAdmin, adminSortCmb, true);
 
-            else{
-                JOptionPane.showMessageDialog(this, "Please select a valid sort option", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        catch (NullPointerException e){
-            logger.log(java.util.logging.Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(this, "Error!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-    }//GEN-LAST:event_adminSortBtnActionPerformed
+    }//GEN-LAST:event_adminAscSortBtnActionPerformed
 
     private void searchAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchAdminActionPerformed
         // TODO add your handling code here:
-        String target=adminSearchTxt.getText();
-        LinkedList <InventoryModel> list = operations.getList();
-
-        if (target.isEmpty()){
-            JOptionPane.showMessageDialog(null, "Please enter a name to search", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        if (adminSearchCmb.getSelectedItem().equals("Search by ID")){
-            sorting.insertionSort(list, "ID");
-            int value = Searching.BinarySearchingID(list, target);
-            if (value==-1) {
-                JOptionPane.showMessageDialog(null, "ID not found", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            else{
-                Structures.loadValuetoTable(viewTableAdmin, list, value);
-            }
-        }
-        else if (adminSearchCmb.getSelectedItem().equals("Search by Name")){
-            sorting.insertionSort(list, "Name");
-            int value = Searching.BinarySearchingName(list, target);
-            if (value==-1) {
-                JOptionPane.showMessageDialog(null, "Name not found", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            else{
-                Structures.loadValuetoTable(viewTableAdmin, list, value);
-            }
-        }
-        else if (adminSearchCmb.getSelectedItem().equals("Search by Company")){
-            sorting.insertionSort(list, "Company");
-            int value = Searching.BinarySearchingCompany(list, target);
-            if (value==-1) {
-                JOptionPane.showMessageDialog(null, "Company not found", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            else{
-                List<Integer> results = Searching.BinarySearchingCompanyName(list, target);
-                structures.loadlistToTable(viewTableAdmin, list, results);
-            }
-        }
+        searchAction(adminSearchTxt.getText(),viewTableAdmin, adminSearchCmb);
 
     }//GEN-LAST:event_searchAdminActionPerformed
 
@@ -1708,11 +2027,248 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void adminLogoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminLogoutBtnActionPerformed
         // TODO add your handling code here:
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.show(mainPanel, "card7");
+        CardLayout card2 = (CardLayout)navPanel.getLayout();
+        card2.show(navPanel, "card4");
+
     }//GEN-LAST:event_adminLogoutBtnActionPerformed
 
     private void userLogoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userLogoutBtnActionPerformed
         // TODO add your handling code here:
+        CardLayout card = (CardLayout)mainPanel.getLayout();
+        card.show(mainPanel, "card6");
+        CardLayout card2 = (CardLayout)navPanel.getLayout();
+        card2.show(navPanel, "card4");
     }//GEN-LAST:event_userLogoutBtnActionPerformed
+
+    private void approvePanelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_approvePanelBtnActionPerformed
+        // TODO add your handling code here:
+        CardLayout card = (CardLayout)adminActionsPanel.getLayout();
+        card.show(adminActionsPanel, "card6");
+        Structures.loadFromQueue(approvalTable,approvalQueue.getQueueData(), approvalQueue.getFront(), approvalQueue.getRear());
+        Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
+
+    }//GEN-LAST:event_approvePanelBtnActionPerformed
+
+    private void approveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_approveBtnActionPerformed
+        // TODO add your handling code here:
+        if (approvalQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No items in approval queue", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        if(approvalHistStack.isFull()){
+            JOptionPane.showMessageDialog(this, "Approval history is full, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (userCartHistStack.isFull()){
+            JOptionPane.showMessageDialog(this, "User cart history is full, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (approvalQueue.getSize() + approvalHistStack.getTop() +1 > size){
+            JOptionPane.showMessageDialog(this, "Not enough space in approval history to approve all items, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try{
+            
+            if (cartQueue.isEmpty()){
+                JOptionPane.showMessageDialog(this, "All pending requests have been approved", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            else{
+                String [] cart = cartQueue.peekFront();
+                approvalHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), operations.getCurrentDate());
+                userCartHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), "Approved");
+                InventoryModel model = operations.findProductID(cart[0]);
+                model.setProductQuantity(model.getProductQuantity() - Integer.parseInt(cart[4]));
+                cartQueue.dequeue();
+            }
+            Structures.loadFromQueue(approvalTable, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+            Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
+            Structures.loadFromQueue(userCartTbl, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+            Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), userCartHistStack.getTop());
+        }
+        catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during approval", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
+    }//GEN-LAST:event_approveBtnActionPerformed
+
+    private void adminApprovalClearAllBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminApprovalClearAllBtnActionPerformed
+        // TODO add your handling code here:
+        if (approvalHistStack.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Approval history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        while (!approvalHistStack.isEmpty()) {
+            approvalHistStack.pop();
+        }
+        Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
+
+    }//GEN-LAST:event_adminApprovalClearAllBtnActionPerformed
+
+    private void adminApprovalClearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminApprovalClearBtnActionPerformed
+        // TODO add your handling code here:
+        if (approvalHistStack.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Approval history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        approvalHistStack.pop();
+        Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
+    }//GEN-LAST:event_adminApprovalClearBtnActionPerformed
+
+    private void clearUserBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearUserBtnActionPerformed
+        // TODO add your handling code here:
+        userSearchTxt1.setText("");
+    }//GEN-LAST:event_clearUserBtnActionPerformed
+
+    private void userSearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userSearchBtnActionPerformed
+        // TODO add your handling code here:
+        searchAction(userSearchTxt1.getText(),userViewTbl, userSearchCmb1);
+
+    }//GEN-LAST:event_userSearchBtnActionPerformed
+
+    private void userSearchTxt1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_userSearchTxt1FocusGained
+        // TODO add your handling code here:
+        userSearchTxt1.setText("");
+    }//GEN-LAST:event_userSearchTxt1FocusGained
+
+    private void userAscSortBtn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userAscSortBtn1ActionPerformed
+        // TODO add your handling code here:
+        sortAction(userViewTbl, userSortCmb1, true);
+    }//GEN-LAST:event_userAscSortBtn1ActionPerformed
+
+    private void userDescSortBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userDescSortBtnActionPerformed
+        // TODO add your handling code here:
+        sortAction(userViewTbl, userSortCmb1, false);
+    }//GEN-LAST:event_userDescSortBtnActionPerformed
+
+    private void adminDescSortBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminDescSortBtnActionPerformed
+        // TODO add your handling code here:
+        sortAction(viewTableAdmin, adminSortCmb, false);
+    }//GEN-LAST:event_adminDescSortBtnActionPerformed
+
+    private void addNewClearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewClearBtnActionPerformed
+        // TODO add your handling code here:
+        if (addNewStack.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Add new history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        while (!addNewStack.isEmpty()) {
+            addNewStack.pop();
+        }
+        Structures.loadFromStack(addNewTable, addNewStack.getStackData(), addNewStack.getTop());
+    }//GEN-LAST:event_addNewClearBtnActionPerformed
+
+    private void updateClearBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateClearBtnActionPerformed
+        // TODO add your handling code here:
+        if (updateStack.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Update history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        while (!updateStack.isEmpty()) {
+            updateStack.pop();
+        }
+        Structures.loadFromStack(updateTable, updateStack.getStackData(), updateStack.getTop());
+    }//GEN-LAST:event_updateClearBtnActionPerformed
+
+    private void approveAllBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_approveAllBtnActionPerformed
+        // TODO add your handling code here:
+        if (approvalQueue.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No items in approval queue", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        if(approvalHistStack.isFull()){
+            JOptionPane.showMessageDialog(this, "Approval history is full, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (userCartHistStack.isFull()){
+            JOptionPane.showMessageDialog(this, "User cart history is full, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (approvalQueue.getSize() + approvalHistStack.getTop() +1 > size){
+            JOptionPane.showMessageDialog(this, "Not enough space in approval history to approve all items, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try{
+            while (!approvalQueue.isEmpty()) {
+
+                if (cartQueue.isEmpty()){
+                    JOptionPane.showMessageDialog(this, "All pending requests have been approved", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                }
+                else{
+                    String [] cart = cartQueue.peekFront();
+                    approvalHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), operations.getCurrentDate());
+                    userCartHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), "Approved");
+                    InventoryModel model = operations.findProductID(cart[0]);
+                    model.setProductQuantity(model.getProductQuantity() - Integer.parseInt(cart[4]));
+                    cartQueue.dequeue();
+                }
+
+            }
+            Structures.loadFromQueue(approvalTable, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+            Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
+            Structures.loadFromQueue(userCartTbl, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+            Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), userCartHistStack.getTop());
+        }catch (NullPointerException e){
+            logger.log(java.util.logging.Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(this, "An error occurred during approval", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+    }//GEN-LAST:event_approveAllBtnActionPerformed
+
+    private void userClearCheckoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userClearCheckoutBtnActionPerformed
+        // TODO add your handling code here:
+        if(userCartHistStack.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Cart is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        while (!userCartHistStack.isEmpty()) {
+            userCartHistStack.pop();
+        }
+        Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), userCartHistStack.getTop());
+    }//GEN-LAST:event_userClearCheckoutBtnActionPerformed
+
+    private void yserCheckoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yserCheckoutBtnActionPerformed
+        // TODO add your handling code here:
+        if(cartQueue.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Cart is empty, add items to cart before checkout", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        LinkedList<InventoryModel> cart =user.getUserCart();
+        for (InventoryModel inventoryModel : cart) {
+            approvalQueue.enqueue(inventoryModel.getProductID(), inventoryModel.getProductName(),
+                    inventoryModel.getProductCompany(), inventoryModel.getProductPrice(), inventoryModel.getProductQuantity(), operations.getCurrentDate());
+
+        }
+        Structures.loadFromQueue(approvalTable, approvalQueue.getQueueData(), approvalQueue.getFront(), approvalQueue.getRear());
+        JOptionPane.showMessageDialog(this, "Checkout successful! Awaiting admin approval.", "Success", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_yserCheckoutBtnActionPerformed
+
+    private void clearDeleteHistoryBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearDeleteHistoryBtnActionPerformed
+        // TODO add your handling code here:
+        if(deleteStack.isEmpty()){
+            JOptionPane.showMessageDialog(this, "Delete history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        while (!deleteStack.isEmpty()) {
+            deleteStack.pop();
+        }
+        Structures.loadFromStack(deleteTable, deleteStack.getStackData(), deleteStack.getTop());
+    }//GEN-LAST:event_clearDeleteHistoryBtnActionPerformed
+
+    private void userPasswordTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_userPasswordTxtKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            userLogin();
+        }
+    }//GEN-LAST:event_userPasswordTxtKeyPressed
 
     /**
      * @param args the command line arguments
@@ -1746,12 +2302,17 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField addIDText;
     private javax.swing.JTextField addNameText;
     private javax.swing.JButton addNewBtn;
+    private javax.swing.JButton addNewClearBtn;
     private javax.swing.JPanel addNewPanel;
     private javax.swing.JButton addNewPanelBtn;
     private javax.swing.JTable addNewTable;
     private javax.swing.JTextField addPriceText;
     private javax.swing.JTextField addQntText;
     private javax.swing.JPanel adminActionsPanel;
+    private javax.swing.JButton adminApprovalClearAllBtn;
+    private javax.swing.JButton adminApprovalClearBtn;
+    private javax.swing.JButton adminAscSortBtn;
+    private javax.swing.JButton adminDescSortBtn;
     private javax.swing.JButton adminLoginBtn;
     private javax.swing.JPanel adminLoginPanel;
     private javax.swing.JButton adminLogoutBtn;
@@ -1760,12 +2321,19 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPasswordField adminPasswordTxt;
     private javax.swing.JComboBox<String> adminSearchCmb;
     private javax.swing.JTextField adminSearchTxt;
-    private javax.swing.JButton adminSortBtn;
     private javax.swing.JComboBox<String> adminSortCmb;
     private javax.swing.JTextField adminUsernameTxt;
+    private javax.swing.JTable approvalHistoryTable;
+    private javax.swing.JTable approvalTable;
+    private javax.swing.JButton approveAllBtn;
+    private javax.swing.JButton approveBtn;
+    private javax.swing.JPanel approvePanel;
+    private javax.swing.JButton approvePanelBtn;
     private javax.swing.JButton cartBtn;
     private javax.swing.JTextField cartIDTxt;
     private javax.swing.JButton clearAdminBtn;
+    private javax.swing.JButton clearDeleteHistoryBtn;
+    private javax.swing.JButton clearUserBtn;
     private javax.swing.JButton deleteBtn;
     private javax.swing.JLabel deleteLabel;
     private javax.swing.JPanel deletePanel;
@@ -1773,11 +2341,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable deleteTable;
     private javax.swing.JTextField deleteText;
     private javax.swing.JTable deleteViewTable;
-    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel grandTotalView;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1794,6 +2358,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1804,10 +2369,12 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
@@ -1832,26 +2399,35 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel upQntLabel;
     private javax.swing.JTextField upQntText;
     private javax.swing.JButton updateBtn;
+    private javax.swing.JButton updateClearBtn;
     private javax.swing.JPanel updatePanel;
     private javax.swing.JButton updatePanelBtn;
     private javax.swing.JTable updateTable;
     private javax.swing.JButton useCartBtn;
     private javax.swing.JPanel userActionsPanel;
+    private javax.swing.JButton userAscSortBtn1;
+    private javax.swing.JTable userCartHistoryTbl;
     private javax.swing.JPanel userCartPanel;
     private javax.swing.JTable userCartTbl;
-    private javax.swing.JTable userCartTbl1;
+    private javax.swing.JButton userClearCheckoutBtn;
+    private javax.swing.JButton userDescSortBtn;
     private javax.swing.JButton userLoginBtn;
     private javax.swing.JPanel userLoginPanel;
     private javax.swing.JButton userLogoutBtn;
     private javax.swing.JPanel userNavPanel;
     private javax.swing.JPanel userPanel;
     private javax.swing.JPasswordField userPasswordTxt;
+    private javax.swing.JButton userSearchBtn;
+    private javax.swing.JComboBox<String> userSearchCmb1;
+    private javax.swing.JTextField userSearchTxt1;
+    private javax.swing.JComboBox<String> userSortCmb1;
     private javax.swing.JTextField userUsernameTxt;
     private javax.swing.JButton userViewBtn;
     private javax.swing.JPanel userViewPanel;
     private javax.swing.JTable userViewTbl;
     private javax.swing.JButton viewAllBtn;
     private javax.swing.JTable viewTableAdmin;
+    private javax.swing.JButton yserCheckoutBtn;
     // End of variables declaration//GEN-END:variables
 }
 

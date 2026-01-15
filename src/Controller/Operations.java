@@ -9,7 +9,9 @@ import Model.InventoryModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.time.LocalDate;
 import java.util.LinkedList;
+
 
 
 
@@ -41,8 +43,7 @@ public class Operations {
         list.add(new InventoryModel("008", "Intraoral Camera", "Sopro", 12000.00, 4, "2025-08-30"));
         list.add(new InventoryModel("009", "Dental Laser", "Wintech", 25000.00, 6, "2025-09-14"));
         list.add(new InventoryModel("010", "Patient Monitor", "Gladent", 8000.00, 9, "2025-10-08"));
-        Admin admin = new Admin("admin", "Ishan Maharjan", "ishan@gmail.com","admin123");
-        User user = new User("user", "user123", "Javier Don");
+
     }
     public boolean addProduct(JPanel panel, String id, String name, String company, String price, String quantity, String date)
     throws IllegalArgumentException, NumberFormatException{
@@ -189,6 +190,13 @@ public class Operations {
         return totalValue;
     }
 
+    public String getCurrentDate(){
+
+        LocalDate today = LocalDate.now();
+
+        return today.toString();
+
+    }
 
 }
 

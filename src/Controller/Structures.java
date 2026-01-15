@@ -16,30 +16,13 @@ import java.util.List;
  * @author Ripple Device
  */
 public class Structures {
-    
-    static int size=10;
-    static int front=-1, rear=-1, top=-1;
-    static String [][] stack = new String [size][6];
+
 
     Operations op = new Operations();
     LinkedList <InventoryModel> list = op.getList();
     
-    
-    public static String[][] pushToStack(String  [][] stack,String id, String name, String company, double price, int quantity, String date){
-        if (top==size-1)
-            return stack;
-        top++;
-        stack[top][0]=id;
-        stack[top][1]=name;
-        stack[top][2]=company;
-        stack[top][3]=String.valueOf(price);
-        stack[top][4]=String.valueOf(quantity);
-        stack[top][5]=date;
-        return stack;
 
-    }
-    
-    public static void loadFromStack(JTable table, String [][] stack){
+    public static void loadFromStack(JTable table, String [][] stack,int top){
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
         if (model.getColumnCount()==3){
@@ -56,8 +39,21 @@ public class Structures {
                 }
             }
         }
-
         
+    }
+
+    public static void loadFromQueue(JTable table, String [][] queue, int front, int rear){
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        if (front==-1||front>rear){
+            JOptionPane.showMessageDialog(null, "Queue is Empty");
+            return;
+        }
+        for(int i =front ; i<=rear; i++){
+            if (queue [i][0]!=null){
+                model.addRow(new Object []{queue[i][0],queue[i][1],queue[i][2],queue[i][3],queue[i][4],queue[i][5]});
+            }
+        }
     }
     
     public static void loadInventoryListToTable(JTable table, java.util.Collection<InventoryModel> list){
@@ -124,11 +120,10 @@ public class Structures {
                     l.getProductCompany(),
                     l.getProductPrice(),
                     l.getProductQuantity(),
-                    l.getAddedDate()
+                    l.getStatus()
             };
             model.addRow(row);
         }
 
     }
-
 }
