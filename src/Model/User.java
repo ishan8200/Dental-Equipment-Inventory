@@ -7,21 +7,29 @@ package Model;
 import java.util.LinkedList;
 
 /**
- *
- * @author Ripple Device
+ * @author Ishan Maharjan
+ * Represents a regular user in the system.
  */
 public class User {
-    String username;
-    String password;
+    private String username; // User username
+    private String password; // User password
+    private String name; // User full name
 
-    String Name;
 
     LinkedList <InventoryModel> userCart = new LinkedList<>();
-    public User(String username, String password, String Name) {
+    /**
+     * Constructor to initialize the user details.
+     * @param username User username.
+     * @param password User password.
+     * @param name User full name.
+     */
+    public User(String username, String password, String name) {
         this.username = username;
         this.password = password;
-        this.Name = Name;
+        this.name = name;
     }
+
+    // Getters and setters for all fields
 
     public String getUsername() {
         return username;
@@ -40,11 +48,11 @@ public class User {
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        name = name;
     }
 
     public LinkedList<InventoryModel> getUserCart() {

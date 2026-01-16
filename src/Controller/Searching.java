@@ -16,7 +16,6 @@ import java.util.List;
  */
 public class Searching {
 
-    Sorting sort = new Sorting();
 
     public static int BinarySearchingID (LinkedList<InventoryModel> list, String target){
         int left=0;
@@ -110,62 +109,6 @@ public class Searching {
 
         System.out.println("Found " + results.size() + " products named: " + target);
         return results;
-    }
-
-
-    public static void mergeSort(LinkedList<InventoryModel> list) {
-        if (list.size() <= 1) {
-            return; // Base case: list is already sorted
-        }
-
-        // Create a temporary list for merging
-        LinkedList<InventoryModel> temp = new LinkedList<>(list);
-        mergeSort(list, temp, 0, list.size() - 1);
-    }
-
-    private static void mergeSort(LinkedList<InventoryModel> list,
-                                  LinkedList<InventoryModel> temp,
-                                  int left, int right) {
-        if (left < right) {
-            int mid = left + (right - left) / 2;
-
-            // Recursively sort left and right halves
-            mergeSort(list, temp, left, mid);
-            mergeSort(list, temp, mid + 1, right);
-
-            // Merge the sorted halves
-            merge(list, temp, left, mid, right);
-        }
-    }
-
-    private static void merge(LinkedList<InventoryModel> list,
-                              LinkedList<InventoryModel> temp,
-                              int left, int mid, int right) {
-        // Copy the segment to temp list
-        for (int i = left; i <= right; i++) {
-            temp.set(i, list.get(i));
-        }
-
-        int i = left;      // Pointer for left subarray
-        int j = mid + 1;   // Pointer for right subarray
-        int k = left;      // Pointer for merged array
-
-        while (i <= mid && j <= right) {
-            // Compare ProductID (case-insensitive)
-            String leftID = temp.get(i).getProductID();
-            String rightID = temp.get(j).getProductID();
-
-            if (leftID.compareToIgnoreCase(rightID) <= 0) {
-                list.set(k++, temp.get(i++));
-            } else {
-                list.set(k++, temp.get(j++));
-            }
-        }
-
-        // Copy remaining elements from left subarray
-        while (i <= mid) {
-            list.set(k++, temp.get(i++));
-        }
     }
 
     

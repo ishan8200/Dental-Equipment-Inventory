@@ -1,15 +1,15 @@
 package Controller;
 
-
 import javax.swing.*;
 
 public class SimpleQueue {
-    private String[][] queuedata;
-    private int front;
-    private int rear;
-    private int size;
-    private int capacity;
+    private String[][] queuedata; // 2D array to store queue data
+    private int front; // Points to the front of the queue
+    private int rear; // Points to the rear of the queue
+    private int size; // Current size of the queue
+    private int capacity; // Maximum capacity of the queue
 
+    // Constructor to initialize the queue with a given capacity
     public SimpleQueue(int capacity) {
         this.capacity = capacity;
         this.queuedata = new String[capacity][6]; // 6 columns: id, name, company, price, quantity, date
@@ -18,6 +18,7 @@ public class SimpleQueue {
         this.size = 0;
     }
 
+    // Method to add an item to the queue
     public void enqueue(String id, String name, String company, double price, int quantity, String date) {
         if (isFull()) {
             JOptionPane.showMessageDialog(null, "Queue is Full");
@@ -35,6 +36,7 @@ public class SimpleQueue {
         size++;
     }
 
+    // Method to remove an item from the queue
     public void dequeue() {
         if (isEmpty()) {
             JOptionPane.showMessageDialog(null, "Queue is Empty");
@@ -56,6 +58,7 @@ public class SimpleQueue {
 
     }
 
+    // Method to peek at the front item of the queue
     public String[] peekFront() {
         if (isEmpty()) {
             return null;
@@ -63,6 +66,7 @@ public class SimpleQueue {
         return queuedata[front];
     }
 
+    // Check if the queue is empty
     public String[] peekRear() {
         if (isEmpty()) {
             JOptionPane.showMessageDialog(null, "Queue is Empty");
@@ -76,26 +80,32 @@ public class SimpleQueue {
         return item;
     }
 
+    // Check if the queue is empty
     public boolean isEmpty() {
         return size == 0;
     }
 
+    // Check if the queue is full
     public boolean isFull() {
         return size == capacity;
     }
 
+    // Get the current size of the queue
     public int getSize() {
         return size;
     }
 
+    // Get the rear index of the queue
     public int getRear() {
         return rear;
     }
 
+    // Get the front index of the queue
     public int getFront() {
         return front;
     }
 
+    // Get the entire queue data
     public String[][] getQueueData() {
         return queuedata;
     }

@@ -7,12 +7,27 @@ package Model;
 /**
  *
  * @author Ishan Maharjan
+ *  Represents a product in the inventory.
+ *  Contains details such as product ID, name, company, price, quantity, and added date.
  */
 public class InventoryModel {
-    String productID, productName, productCompany, addedDate,status;
-    int productQuantity;
-    double productPrice;
+    private String productID; // Unique identifier for the product
+    private String productName; // Name of the product
+    private String productCompany; // Company manufacturing the product
+    private double productPrice; // Price of the product
+    private int productQuantity; // Quantity available in inventory
+    private String addedDate; // Date the product was added to the inventory
+    private String status; // Status of the product (optional, e.g., "Available", "Out of Stock")
 
+    /**
+     * Constructor to initialize the product details.
+     * @param productID Unique identifier for the product.
+     * @param productName Name of the product.
+     * @param productCompany Company manufacturing the product.
+     * @param productPrice Price of the product.
+     * @param productQuantity Quantity available in inventory.
+     * @param addedDate Date the product was added to the inventory.
+     */
     public InventoryModel(String productID, String productName, String productCompany, double productPrice, int productQuantity, String addedDate) {
         this.productID = productID;
         this.productName = productName;
@@ -29,6 +44,7 @@ public class InventoryModel {
         this.productQuantity = productQuantity;
         this.status = "Pending";
     }
+    // Getters and setters for all fields
 
     public String getProductID() {
         return productID;

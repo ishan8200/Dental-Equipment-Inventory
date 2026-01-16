@@ -17,7 +17,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Ripple Device
+ * @author Ishan Maharjan
  */
 public class MainFrame extends javax.swing.JFrame {
 
@@ -72,7 +72,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.list=operations.getList();
         Structures.loadInventoryListToTable(viewTableAdmin, list);
         Structures.loadInventoryListToTable(userViewTbl, list);
-
+        userNameLable.setText("Name: "+user.getName());
 
 
     }
@@ -242,7 +242,7 @@ public class MainFrame extends javax.swing.JFrame {
         userViewBtn = new javax.swing.JButton();
         useCartBtn = new javax.swing.JButton();
         userLogoutBtn = new javax.swing.JButton();
-        jLabel21 = new javax.swing.JLabel();
+        userNameLable = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel(scaledIcon);
         mainPanel = new javax.swing.JPanel();
         adminLoginPanel = new javax.swing.JPanel();
@@ -351,7 +351,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel19 = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
         userCartTbl = new javax.swing.JTable();
-        yserCheckoutBtn = new javax.swing.JButton();
+        userCheckoutBtn = new javax.swing.JButton();
         jScrollPane9 = new javax.swing.JScrollPane();
         userCartHistoryTbl = new javax.swing.JTable();
         userClearCheckoutBtn = new javax.swing.JButton();
@@ -531,10 +531,10 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabel21.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel21.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel21.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel21.setText("Name");
+        userNameLable.setBackground(new java.awt.Color(0, 0, 0));
+        userNameLable.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        userNameLable.setForeground(new java.awt.Color(255, 255, 255));
+        userNameLable.setText("Name: ");
 
         jLabel23.setText("jLabel23");
 
@@ -548,7 +548,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(30, 30, 30))
             .addGroup(userPanelLayout.createSequentialGroup()
                 .addGap(30, 30, 30)
-                .addComponent(jLabel21)
+                .addComponent(userNameLable)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(userPanelLayout.createSequentialGroup()
                 .addComponent(jLabel23)
@@ -565,7 +565,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(10, 10, 10)
                 .addComponent(userNavPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(100, 100, 100)
-                .addComponent(jLabel21)
+                .addComponent(userNameLable)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 426, Short.MAX_VALUE)
                 .addComponent(userLogoutBtn)
                 .addGap(100, 100, 100))
@@ -736,6 +736,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company", "Price", "Quantity", "Added Date"
             }
         ));
+        viewTableAdmin.setRowHeight(25);
         jScrollPane1.setViewportView(viewTableAdmin);
         if (viewTableAdmin.getColumnModel().getColumnCount() > 0) {
             viewTableAdmin.getColumnModel().getColumn(0).setResizable(false);
@@ -873,6 +874,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company", "Price", "Quantity", "Date"
             }
         ));
+        addNewTable.setRowHeight(25);
         jScrollPane2.setViewportView(addNewTable);
         if (addNewTable.getColumnModel().getColumnCount() > 0) {
             addNewTable.getColumnModel().getColumn(0).setResizable(false);
@@ -910,7 +912,7 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel2.add(jLabel8);
         jPanel2.add(addDateText);
 
-        addNewClearBtn.setText("Clear");
+        addNewClearBtn.setText("Clear History");
         addNewClearBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addNewClearBtnActionPerformed(evt);
@@ -984,6 +986,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company", "Price", "Quantity", "Date"
             }
         ));
+        updateTable.setRowHeight(25);
         jScrollPane3.setViewportView(updateTable);
         if (updateTable.getColumnModel().getColumnCount() > 0) {
             updateTable.getColumnModel().getColumn(0).setResizable(false);
@@ -1041,7 +1044,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 50)); // NOI18N
         jLabel15.setText("Dental Inventory Solutions");
 
-        updateClearBtn.setText("Clear");
+        updateClearBtn.setText("Clear History");
         updateClearBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateClearBtnActionPerformed(evt);
@@ -1052,24 +1055,26 @@ public class MainFrame extends javax.swing.JFrame {
         updatePanel.setLayout(updatePanelLayout);
         updatePanelLayout.setHorizontalGroup(
             updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3)
             .addGroup(updatePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(updateClearBtn)
-                .addGap(102, 102, 102)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(updateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(82, 82, 82))
-            .addComponent(jScrollPane3)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
-                .addGap(110, 110, 110)
                 .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(updatePanelLayout.createSequentialGroup()
+                        .addComponent(updateClearBtn)
+                        .addGap(76, 76, 76)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 430, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(updateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(82, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
-                        .addComponent(jLabel15)
-                        .addGap(110, 110, 110))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
-                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(304, 304, 304))))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
+                                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(304, 304, 304))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, updatePanelLayout.createSequentialGroup()
+                                .addComponent(jLabel15)
+                                .addGap(110, 110, 110))))))
         );
         updatePanelLayout.setVerticalGroup(
             updatePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1107,6 +1112,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company"
             }
         ));
+        deleteTable.setRowHeight(25);
         jScrollPane4.setViewportView(deleteTable);
         if (deleteTable.getColumnModel().getColumnCount() > 0) {
             deleteTable.getColumnModel().getColumn(0).setResizable(false);
@@ -1134,6 +1140,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company"
             }
         ));
+        deleteViewTable.setRowHeight(25);
         jScrollPane5.setViewportView(deleteViewTable);
         if (deleteViewTable.getColumnModel().getColumnCount() > 0) {
             deleteViewTable.getColumnModel().getColumn(0).setResizable(false);
@@ -1144,7 +1151,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel10.setText("List of all products");
 
-        clearDeleteHistoryBtn.setText("Clear");
+        clearDeleteHistoryBtn.setText("Clear History");
         clearDeleteHistoryBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearDeleteHistoryBtnActionPerformed(evt);
@@ -1224,6 +1231,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company Name", "Price", "Quantity", "Date"
             }
         ));
+        approvalTable.setRowHeight(25);
         jScrollPane6.setViewportView(approvalTable);
         if (approvalTable.getColumnModel().getColumnCount() > 0) {
             approvalTable.getColumnModel().getColumn(0).setResizable(false);
@@ -1254,6 +1262,7 @@ public class MainFrame extends javax.swing.JFrame {
                 "ID", "Name", "Company Name", "Price", "Quantity", "Date"
             }
         ));
+        approvalHistoryTable.setRowHeight(25);
         jScrollPane10.setViewportView(approvalHistoryTable);
         if (approvalHistoryTable.getColumnModel().getColumnCount() > 0) {
             approvalHistoryTable.getColumnModel().getColumn(0).setResizable(false);
@@ -1362,6 +1371,7 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        userViewTbl.setRowHeight(25);
         jScrollPane8.setViewportView(userViewTbl);
         if (userViewTbl.getColumnModel().getColumnCount() > 0) {
             userViewTbl.getColumnModel().getColumn(0).setResizable(false);
@@ -1450,34 +1460,34 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane8)
                     .addGroup(userViewPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel16)
-                        .addGap(30, 30, 30)
-                        .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(40, 40, 40)
-                        .addComponent(jLabel20)
-                        .addGap(30, 30, 30)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(40, 40, 40)
-                        .addComponent(cartBtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
-                        .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10))
-                    .addGroup(userViewPanelLayout.createSequentialGroup()
-                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(userViewPanelLayout.createSequentialGroup()
                                 .addComponent(userSearchCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(userSearchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(clearUserBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(userSearchTxt1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(156, 156, 156)
-                        .addComponent(userSortCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(userSearchTxt1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(userViewPanelLayout.createSequentialGroup()
+                                .addComponent(jLabel16)
+                                .addGap(30, 30, 30)
+                                .addComponent(cartIDTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(52, 52, 52)
+                                .addComponent(jLabel20)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(36, 36, 36)
+                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cartBtn)
+                            .addComponent(userSortCmb1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(userAscSortBtn1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(userDescSortBtn)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(userViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(grandTotalView, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(userViewPanelLayout.createSequentialGroup()
+                                .addComponent(userAscSortBtn1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(userDescSortBtn)
+                                .addGap(0, 13, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         userViewPanelLayout.setVerticalGroup(
@@ -1539,6 +1549,7 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        userCartTbl.setRowHeight(25);
         jScrollPane7.setViewportView(userCartTbl);
         if (userCartTbl.getColumnModel().getColumnCount() > 0) {
             userCartTbl.getColumnModel().getColumn(0).setResizable(false);
@@ -1549,10 +1560,10 @@ public class MainFrame extends javax.swing.JFrame {
             userCartTbl.getColumnModel().getColumn(5).setHeaderValue("Status");
         }
 
-        yserCheckoutBtn.setText("Checkout");
-        yserCheckoutBtn.addActionListener(new java.awt.event.ActionListener() {
+        userCheckoutBtn.setText("Checkout");
+        userCheckoutBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                yserCheckoutBtnActionPerformed(evt);
+                userCheckoutBtnActionPerformed(evt);
             }
         });
 
@@ -1576,6 +1587,7 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        userCartHistoryTbl.setRowHeight(25);
         jScrollPane9.setViewportView(userCartHistoryTbl);
         if (userCartHistoryTbl.getColumnModel().getColumnCount() > 0) {
             userCartHistoryTbl.getColumnModel().getColumn(0).setResizable(false);
@@ -1586,7 +1598,7 @@ public class MainFrame extends javax.swing.JFrame {
             userCartHistoryTbl.getColumnModel().getColumn(5).setHeaderValue("Status");
         }
 
-        userClearCheckoutBtn.setText("Clear");
+        userClearCheckoutBtn.setText("Clear History");
         userClearCheckoutBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 userClearCheckoutBtnActionPerformed(evt);
@@ -1605,8 +1617,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(702, 702, 702)
                 .addGroup(userCartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(userClearCheckoutBtn)
-                    .addComponent(yserCheckoutBtn))
-                .addContainerGap(17, Short.MAX_VALUE))
+                    .addComponent(userCheckoutBtn))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, userCartPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane7)
@@ -1622,7 +1634,7 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGap(50, 50, 50)
                 .addComponent(jLabel19)
                 .addGap(55, 55, 55)
-                .addComponent(yserCheckoutBtn)
+                .addComponent(userCheckoutBtn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16)
@@ -1743,6 +1755,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void deleteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtnActionPerformed
         // TODO add your handling code here:
+
         String productId=deleteText.getText();
         InventoryModel l =null;
         try {
@@ -1766,12 +1779,15 @@ public class MainFrame extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Delete history is full, remove product from history to continue", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            InventoryModel model = new InventoryModel(l.getProductID(), l.getProductName(), l.getProductCompany(), l.getProductPrice(), l.getProductQuantity(), l.getAddedDate());
-            operations.deleteProduct(l,deletePanel);
+            if(JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to delete this product?",
+                    "Confirm Delete", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION) {
+                InventoryModel model = new InventoryModel(l.getProductID(), l.getProductName(), l.getProductCompany(), l.getProductPrice(), l.getProductQuantity(), l.getAddedDate());
+                operations.deleteProduct(l, deletePanel);
 
-            //push to delete history stack
-            deleteStack.push(model.getProductID(), model.getProductName(), model.getProductCompany(), model.getProductPrice(), model.getProductQuantity(), model.getAddedDate());
-
+                //push to delete history stack
+                deleteStack.push(model.getProductID(), model.getProductName(), model.getProductCompany(), model.getProductPrice(), model.getProductQuantity(), model.getAddedDate());
+            }
             this.list=operations.getList();
             Structures.loadFromStack(deleteTable,deleteStack.getStackData(),deleteStack.getTop());
             Structures.loadInventoryListToTable(deleteViewTable, this.list);
@@ -2027,19 +2043,32 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void adminLogoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminLogoutBtnActionPerformed
         // TODO add your handling code here:
-        CardLayout card = (CardLayout)mainPanel.getLayout();
-        card.show(mainPanel, "card7");
-        CardLayout card2 = (CardLayout)navPanel.getLayout();
-        card2.show(navPanel, "card4");
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to logout?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+            CardLayout card = (CardLayout)mainPanel.getLayout();
+            card.show(mainPanel, "card7");
+            CardLayout card2 = (CardLayout)navPanel.getLayout();
+            card2.show(navPanel, "card4");
+        }
 
     }//GEN-LAST:event_adminLogoutBtnActionPerformed
 
     private void userLogoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userLogoutBtnActionPerformed
         // TODO add your handling code here:
-        CardLayout card = (CardLayout)mainPanel.getLayout();
-        card.show(mainPanel, "card6");
-        CardLayout card2 = (CardLayout)navPanel.getLayout();
-        card2.show(navPanel, "card4");
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to logout?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+            CardLayout card = (CardLayout)mainPanel.getLayout();
+            card.show(mainPanel, "card6");
+            CardLayout card2 = (CardLayout)navPanel.getLayout();
+            card2.show(navPanel, "card4");
+        }
+
     }//GEN-LAST:event_userLogoutBtnActionPerformed
 
     private void approvePanelBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_approvePanelBtnActionPerformed
@@ -2082,8 +2111,9 @@ public class MainFrame extends javax.swing.JFrame {
                 InventoryModel model = operations.findProductID(cart[0]);
                 model.setProductQuantity(model.getProductQuantity() - Integer.parseInt(cart[4]));
                 cartQueue.dequeue();
+                approvalQueue.dequeue();
             }
-            Structures.loadFromQueue(approvalTable, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+            Structures.loadFromQueue(approvalTable, approvalQueue.getQueueData(), approvalQueue.getFront(), approvalQueue.getRear());
             Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
             Structures.loadFromQueue(userCartTbl, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
             Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), userCartHistStack.getTop());
@@ -2103,9 +2133,16 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Approval history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        while (!approvalHistStack.isEmpty()) {
-            approvalHistStack.pop();
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to clear approval history?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+            while (!approvalHistStack.isEmpty()) {
+                approvalHistStack.pop();
+            }
         }
+
         Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
 
     }//GEN-LAST:event_adminApprovalClearAllBtnActionPerformed
@@ -2169,9 +2206,16 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Update history is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        while (!updateStack.isEmpty()) {
-            updateStack.pop();
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to clear update history?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+            while (!updateStack.isEmpty()) {
+                updateStack.pop();
+            }
         }
+
         Structures.loadFromStack(updateTable, updateStack.getStackData(), updateStack.getTop());
     }//GEN-LAST:event_updateClearBtnActionPerformed
 
@@ -2193,32 +2237,42 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Not enough space in approval history to approve all items, clear history to continue", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        try{
-            while (!approvalQueue.isEmpty()) {
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to approve all pending requests?",
+                "Confirm Approval",
+                JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            try{
+                while (!approvalQueue.isEmpty()) {
 
-                if (cartQueue.isEmpty()){
-                    JOptionPane.showMessageDialog(this, "All pending requests have been approved", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-                else{
-                    String [] cart = cartQueue.peekFront();
-                    approvalHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), operations.getCurrentDate());
-                    userCartHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), "Approved");
-                    InventoryModel model = operations.findProductID(cart[0]);
-                    model.setProductQuantity(model.getProductQuantity() - Integer.parseInt(cart[4]));
-                    cartQueue.dequeue();
+                    if (cartQueue.isEmpty()){
+                        JOptionPane.showMessageDialog(this, "All pending requests have been approved", "Info", JOptionPane.INFORMATION_MESSAGE);
+                        return;
+                    }
+                    else{
+                        String [] cart = cartQueue.peekFront();
+                        approvalHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), operations.getCurrentDate());
+                        userCartHistStack.push(cart[0], cart[1], cart[2], Double.parseDouble(cart[3]), Integer.parseInt(cart[4]), "Approved");
+                        InventoryModel model = operations.findProductID(cart[0]);
+                        model.setProductQuantity(model.getProductQuantity() - Integer.parseInt(cart[4]));
+                        cartQueue.dequeue();
+                        approvalQueue.dequeue();
+                    }
+
                 }
 
+            }catch (NullPointerException e){
+                logger.log(java.util.logging.Level.SEVERE, null, e);
+                JOptionPane.showMessageDialog(this, "An error occurred during approval", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            Structures.loadFromQueue(approvalTable, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
+            Structures.loadFromQueue(approvalTable, approvalQueue.getQueueData(), approvalQueue.getFront(), approvalQueue.getRear());
             Structures.loadFromStack(approvalHistoryTable, approvalHistStack.getStackData(), approvalHistStack.getTop());
             Structures.loadFromQueue(userCartTbl, cartQueue.getQueueData(), cartQueue.getFront(), cartQueue.getRear());
             Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), userCartHistStack.getTop());
-        }catch (NullPointerException e){
-            logger.log(java.util.logging.Level.SEVERE, null, e);
-            JOptionPane.showMessageDialog(this, "An error occurred during approval", "Error", JOptionPane.ERROR_MESSAGE);
             return;
+
         }
+
 
     }//GEN-LAST:event_approveAllBtnActionPerformed
 
@@ -2228,27 +2282,47 @@ public class MainFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Cart is already empty", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        while (!userCartHistStack.isEmpty()) {
-            userCartHistStack.pop();
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to clear cart history?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            while (!userCartHistStack.isEmpty()) {
+                userCartHistStack.pop();
+            }
         }
+
         Structures.loadFromStack(userCartHistoryTbl, userCartHistStack.getStackData(), userCartHistStack.getTop());
     }//GEN-LAST:event_userClearCheckoutBtnActionPerformed
 
-    private void yserCheckoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yserCheckoutBtnActionPerformed
+    private void userCheckoutBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userCheckoutBtnActionPerformed
         // TODO add your handling code here:
         if(cartQueue.isEmpty()){
             JOptionPane.showMessageDialog(this, "Cart is empty, add items to cart before checkout", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        LinkedList<InventoryModel> cart =user.getUserCart();
-        for (InventoryModel inventoryModel : cart) {
-            approvalQueue.enqueue(inventoryModel.getProductID(), inventoryModel.getProductName(),
-                    inventoryModel.getProductCompany(), inventoryModel.getProductPrice(), inventoryModel.getProductQuantity(), operations.getCurrentDate());
+        if(approvalQueue.isFull()){
+            JOptionPane.showMessageDialog(this, "Approval queue is full, please wait for admin to approve items", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if(JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to checkout? Your cart items will be sent for admin approval.",
+                "Confirm Checkout",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            LinkedList<InventoryModel> cart =user.getUserCart();
+            for (InventoryModel inventoryModel : cart) {
+                approvalQueue.enqueue(inventoryModel.getProductID(), inventoryModel.getProductName(),
+                        inventoryModel.getProductCompany(), inventoryModel.getProductPrice(), inventoryModel.getProductQuantity(), operations.getCurrentDate());
+
+            }
+            Structures.loadFromQueue(approvalTable, approvalQueue.getQueueData(), approvalQueue.getFront(), approvalQueue.getRear());
+            JOptionPane.showMessageDialog(this, "Checkout successful! Awaiting admin approval.", "Success", JOptionPane.INFORMATION_MESSAGE);
 
         }
-        Structures.loadFromQueue(approvalTable, approvalQueue.getQueueData(), approvalQueue.getFront(), approvalQueue.getRear());
-        JOptionPane.showMessageDialog(this, "Checkout successful! Awaiting admin approval.", "Success", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_yserCheckoutBtnActionPerformed
+        else {
+            return;
+        }
+
+    }//GEN-LAST:event_userCheckoutBtnActionPerformed
 
     private void clearDeleteHistoryBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearDeleteHistoryBtnActionPerformed
         // TODO add your handling code here:
@@ -2257,10 +2331,16 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
-        while (!deleteStack.isEmpty()) {
-            deleteStack.pop();
-        }
+        if (JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to clear delete history?",
+                "Confirm",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+            while (!deleteStack.isEmpty()) {
+                deleteStack.pop();
+            }
         Structures.loadFromStack(deleteTable, deleteStack.getStackData(), deleteStack.getTop());
+        }
     }//GEN-LAST:event_clearDeleteHistoryBtnActionPerformed
 
     private void userPasswordTxtKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_userPasswordTxtKeyPressed
@@ -2355,7 +2435,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
@@ -2409,11 +2488,13 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable userCartHistoryTbl;
     private javax.swing.JPanel userCartPanel;
     private javax.swing.JTable userCartTbl;
+    private javax.swing.JButton userCheckoutBtn;
     private javax.swing.JButton userClearCheckoutBtn;
     private javax.swing.JButton userDescSortBtn;
     private javax.swing.JButton userLoginBtn;
     private javax.swing.JPanel userLoginPanel;
     private javax.swing.JButton userLogoutBtn;
+    private javax.swing.JLabel userNameLable;
     private javax.swing.JPanel userNavPanel;
     private javax.swing.JPanel userPanel;
     private javax.swing.JPasswordField userPasswordTxt;
@@ -2427,7 +2508,6 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTable userViewTbl;
     private javax.swing.JButton viewAllBtn;
     private javax.swing.JTable viewTableAdmin;
-    private javax.swing.JButton yserCheckoutBtn;
     // End of variables declaration//GEN-END:variables
 }
 

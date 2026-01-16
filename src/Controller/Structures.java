@@ -46,7 +46,7 @@ public class Structures {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
         if (front==-1||front>rear){
-            JOptionPane.showMessageDialog(null, "Queue is Empty");
+            //JOptionPane.showMessageDialog(null, "Queue is Empty");
             return;
         }
         for(int i =front ; i<=rear; i++){
